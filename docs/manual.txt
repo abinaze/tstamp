@@ -136,17 +136,17 @@ SHELL COMPATIBILITY
 
   Combination                          Status
   -----------------------------------  ----------------------------------
-  Git Bash on Windows (bash 5.2)       Per-terminal and global tracking
-                                       pass automated tests that drive
-                                       scripted interactive shells. Not
-                                       yet tried by hand in a window.
-                                       Reboot reset only simulated, not
-                                       yet tested with a real restart.
+  Git Bash 5.2, Windows build 26100    Automated tests pass: per-terminal
+                                       and global tracking, export, hook.
+                                       Installer not yet run by hand.
+  Git Bash on a GitHub-hosted          Full test suite, silent install and
+  Windows runner                       silent uninstall passed in CI.
+  Reboot reset                         Simulated only; not tested with a
+                                       real restart.
   Git Bash in Windows Terminal or      Not tested yet.
   an IDE terminal
   Bash on Linux or macOS               Not tested yet. macOS ships bash
-                                       3.2, which is too old (4.4 or
-                                       newer is needed).
+                                       3.2, which is too old (4.4+).
   WSL                                  Not tested yet.
   Zsh, Fish                            Not implemented.
   PowerShell, CMD                      Not implemented.
@@ -191,20 +191,42 @@ PRIVACY
     rm -rf ~/.tstamp/logs
 
 INSTALLATION
-  There is no installer yet. To try TStamp in one terminal, run:
+  Windows installer (Git Bash)
+    1. Install Git for Windows if you do not have it, because TStamp
+       runs inside Git Bash: https://git-scm.com/download/win
+    2. Open https://github.com/abinaze/tstamp/releases/latest, download
+       the tstamp-setup file and run it. Windows SmartScreen may warn
+       because the installer is not code-signed: choose More info, then
+       Run anyway. SHA256SUMS.txt on the same page lets you check the
+       download.
+    3. Leave "Load TStamp in every new Git Bash window" ticked. The
+       installer first backs up ~/.bashrc, then adds a short block
+       between "# >>> tstamp >>>" and "# <<< tstamp <<<".
+    4. Open a new Git Bash window and type: tstamp-a
 
-    source /path/to/tstamp/shells/bash.sh
+  The installer needs no administrator rights and installs into
+  %LOCALAPPDATA%\Programs\TStamp.
 
-  This changes nothing permanently: closing the terminal removes it.
-  A guided installer is planned. It will ask before changing any shell
-  profile, back the profile up first and print rollback instructions.
+  Without the installer
+    To try TStamp in one terminal (closing it removes everything):
+      source /path/to/tstamp/shells/bash.sh
+    To load it in every new Git Bash window, run: tstamp hook add
 
 UNINSTALLATION
-  The current version changes no shell profile. To remove it:
+  With the installer
+    Open Windows Settings, then Apps, find TStamp and choose Uninstall.
+    It removes the block from ~/.bashrc (after a backup) and deletes the
+    program files. It asks whether to delete your settings and logs in
+    ~/.tstamp; the default answer is No.
 
-    1. Run "tstamp stop", then close your terminals.
-    2. Delete the state folder:  rm -rf ~/.tstamp
-    3. Delete the tstamp project folder.
+  Without the installer
+    1. If you ran "tstamp hook add", run: tstamp hook remove
+    2. Run "tstamp stop", then close your terminals.
+    3. Delete ~/.tstamp and the tstamp project folder.
+
+  Backups of ~/.bashrc stay next to it, named like
+  .bashrc.tstamp-backup-DATE-TIME. Delete them when you no longer
+  need them.
 
 LIMITATIONS
   Not yet tested: full-screen programs (vim, less, ssh), several
