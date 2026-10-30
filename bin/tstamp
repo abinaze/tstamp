@@ -11,7 +11,13 @@ source "$TSTAMP_ROOT/lib/config.sh"
 # shellcheck source=/dev/null
 source "$TSTAMP_ROOT/lib/format.sh"
 # shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/clock.sh"
+# shellcheck source=/dev/null
 source "$TSTAMP_ROOT/lib/state.sh"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/export.sh"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/profile.sh"
 
 # Usage: show_doc FILE [pager]
 # Prints docs/FILE. With "pager", uses less when stdout is a terminal.
@@ -79,12 +85,18 @@ case "$cmd" in
     echo "Standalone status (a hooked terminal also shows its own state):"
     tstamp_print_global_status
     ;;
+  export)
+    shift
+    tstamp_export "$@"
+    exit $?
+    ;;
+  hook)
+    shift
+    tstamp_cmd_hook "$@"
+    exit $?
+    ;;
   [1-5])
     echo "tstamp $cmd needs the shell hook loaded in this terminal. Not available here." >&2
-    exit 2
-    ;;
-  export)
-    echo "tstamp: 'export' is not implemented yet." >&2
     exit 2
     ;;
   *)
