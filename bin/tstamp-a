@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# tstamp-a: enable global tracking. Usable from any terminal once bin/ is on PATH.
+exec bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/tstamp" global-on "$@"
