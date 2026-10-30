@@ -22,8 +22,9 @@ Working today:
 - Global tracking across terminals: `tstamp-a`, `tstamp stop`
 - Formats: `tstamp format`, `tstamp set`, `tstamp reset`
 - Offline docs: `tstamp help`, `tstamp man`, `tstamp examples`
+- Merged report of all sessions: `tstamp export`
 
-Not built yet: `tstamp export`, the installer, other shells.
+Not built yet: the installer, other shells.
 
 ## Try it in one terminal
 
