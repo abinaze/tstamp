@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# TStamp command dispatcher (Phase 3: version, format, set, reset).
+# TStamp command dispatcher.
+# Per-terminal commands (tstamp, tstamp N, and tstamp stop for the current
+# terminal) are provided by shells/bash.sh. This script handles everything
+# that does not need to change the shell it runs in.
 
 set -u
 TSTAMP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -7,6 +10,8 @@ TSTAMP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$TSTAMP_ROOT/lib/config.sh"
 # shellcheck source=/dev/null
 source "$TSTAMP_ROOT/lib/format.sh"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/state.sh"
 
 cmd="${1:-}"
 
@@ -36,11 +41,25 @@ case "$cmd" in
     tstamp_config_reset || exit 1
     echo "Configuration reset to defaults (format $TSTAMP_DEFAULT_FORMAT)."
     ;;
+  global-on)
+    shift
+    tstamp_cmd_global_on "$@"
+    exit $?
+    ;;
+  stop)
+    tstamp_global_disable || exit 1
+    echo "Global tracking stopped."
+    echo "Terminals with the shell hook stop at their next prompt."
+    ;;
+  status)
+    echo "Standalone status (a hooked terminal also shows its own state):"
+    tstamp_print_global_status
+    ;;
   [1-5])
-    echo "tstamp $cmd needs the shell integration (Phase 4). Not available yet." >&2
+    echo "tstamp $cmd needs the shell hook loaded in this terminal. Not available here." >&2
     exit 2
     ;;
-  stop|status|export|help|man|examples|"")
+  export|help|man|examples|"")
     echo "tstamp: '${cmd:-<none>}' is not implemented yet." >&2
     exit 2
     ;;
