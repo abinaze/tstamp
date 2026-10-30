@@ -97,6 +97,7 @@ jobs:
           cat SHA256SUMS.txt
 
       - name: Upload the installer
+        continue-on-error: true
         if: steps.build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
@@ -105,6 +106,7 @@ jobs:
             dist/tstamp-setup-*.exe
             dist/SHA256SUMS.txt
           if-no-files-found: error
+          retention-days: 3
 
       - name: Smoke test, silent install
         if: steps.build.outcome == 'success'
