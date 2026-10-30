@@ -1,0 +1,18 @@
+tstamp - local-first terminal timestamp utility
+
+USAGE
+  tstamp [FORMAT]        Enable tracking in this terminal
+  tstamp-a [FORMAT]      Enable tracking in all hooked terminals
+  tstamp stop            Stop tracking globally and in this terminal
+  tstamp status          Show global and this-terminal status
+  tstamp format          List the timestamp formats
+  tstamp set FORMAT      Change the default format
+  tstamp export          Export session logs (not implemented yet)
+  tstamp help            Show this help
+  tstamp man             Show the full offline manual
+  tstamp examples        Show examples
+  tstamp version         Show the installed version
+  tstamp reset           Restore the default configuration
+
+FORMAT is a number 1-5 or a custom date format string such as "%H:%M".
+Run "tstamp format" to list the formats and "tstamp man" for the manual.
