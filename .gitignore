@@ -1,0 +1,11 @@
+# Local runtime state and logs
+.tstamp/
+*.log
+*.tmp
+*.transcript
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
