@@ -1,0 +1,32 @@
+TStamp examples
+
+Enable tracking in this terminal with the default format:
+  tstamp
+
+Enable tracking here with format 2 (hours, minutes, seconds):
+  tstamp 2
+
+Use a custom format in this terminal only:
+  tstamp "%d/%m/%Y %H:%M:%S"
+
+Enable tracking in every terminal that has the hook, using format 4:
+  tstamp-a 4
+
+Stop tracking everywhere (and in this terminal):
+  tstamp stop
+
+Change the saved default format:
+  tstamp set 5
+  tstamp set "%H:%M:%S.%3N"
+
+List the formats, then check what is running:
+  tstamp format
+  tstamp status
+
+Restore the default configuration:
+  tstamp reset
+
+What you see while tracking is on:
+  [T1][2026-10-29 19:42:01.100] START: npm run build
+  Build failed.
+  [T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s
