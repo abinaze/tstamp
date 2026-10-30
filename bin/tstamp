@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# TStamp command dispatcher (Phase 3: version, format, set, reset).
+
+set -u
+TSTAMP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/config.sh"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/format.sh"
+
+cmd="${1:-}"
+
+case "$cmd" in
+  version|--version|-v)
+    echo "tstamp $(cat "$TSTAMP_ROOT/VERSION")"
+    ;;
+  format|formats)
+    tstamp_config_init || exit 1
+    tstamp_format_list "$(tstamp_config_get format "$TSTAMP_DEFAULT_FORMAT")"
+    ;;
+  set)
+    if [ "$#" -ne 2 ]; then
+      echo "usage: tstamp set FORMAT" >&2
+      exit 2
+    fi
+    if ! tstamp_format_validate "$2"; then
+      echo "tstamp: invalid format: $2" >&2
+      echo "Use a number 1-5 or a custom date format string containing %." >&2
+      exit 2
+    fi
+    tstamp_config_set format "$2" || exit 1
+    echo "Default format set to: $2"
+    echo "Example: $(tstamp_now "$(tstamp_format_string "$2")")"
+    ;;
+  reset)
+    tstamp_config_reset || exit 1
+    echo "Configuration reset to defaults (format $TSTAMP_DEFAULT_FORMAT)."
+    ;;
+  [1-5])
+    echo "tstamp $cmd needs the shell integration (Phase 4). Not available yet." >&2
+    exit 2
+    ;;
+  stop|status|export|help|man|examples|"")
+    echo "tstamp: '${cmd:-<none>}' is not implemented yet." >&2
+    exit 2
+    ;;
+  *)
+    echo "tstamp: unknown command: $cmd" >&2
+    exit 2
+    ;;
+esac
