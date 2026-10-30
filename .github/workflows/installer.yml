@@ -1,0 +1,173 @@
+name: Build Windows installer
+
+# Starts by hand (Actions tab, Run workflow) or when a version tag is pushed.
+# A manual run tests, builds, smoke-tests and uploads the installer as a
+# build artifact. Only pushing a tag such as v0.1.0 publishes a GitHub Release.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    name: Test, build and smoke-test the installer
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Show the environment
+        shell: bash
+        run: |
+          bash --version | head -n 1
+          git --version
+          date +"%Y-%m-%d %H:%M:%S.%3N %z"
+          uname -s
+
+      - name: Run the test suite
+        id: tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          status=0
+          for t in tests/test_*.sh; do
+            echo "== $t"
+            out="$(bash "$t" 2>&1)" || status=1
+            printf '%s\n' "$out" | grep -E '^(FAIL|passed)' || true
+          done
+          exit "$status"
+
+      - name: Check the version
+        id: ver
+        shell: bash
+        run: |
+          v="$(tr -d '\r\n' < VERSION)"
+          if ! [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "VERSION '$v' is not a valid version" >&2
+            exit 1
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the VERSION file (v$v)" >&2
+            exit 1
+          fi
+
+      - name: Stage the files to install
+        shell: bash
+        run: bash installer/stage.sh
+
+      - name: Find or install Inno Setup
+        id: inno
+        shell: pwsh
+        run: |
+          $paths = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+          )
+          $found = $paths | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $found) {
+            Write-Host "Inno Setup not preinstalled; installing with Chocolatey"
+            choco install innosetup --no-progress -y
+            $found = $paths | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          if (-not $found) { throw "ISCC.exe was not found" }
+          Write-Host "Using $found"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "iscc=$found"
+
+      - name: Build the installer
+        id: build
+        shell: pwsh
+        run: |
+          & "${{ steps.inno.outputs.iscc }}" "/DMyAppVersion=${{ steps.ver.outputs.version }}" installer\tstamp.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+          Get-ChildItem dist\*.exe
+
+      - name: Write checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum tstamp-setup-*.exe > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Upload the installer
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tstamp-setup-${{ steps.ver.outputs.version }}
+          path: |
+            dist/tstamp-setup-*.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Smoke test, silent install
+        if: steps.build.outcome == 'success'
+        shell: pwsh
+        run: |
+          $setup = (Get-ChildItem dist\tstamp-setup-*.exe | Select-Object -First 1).FullName
+          $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/LOG=install.log' -Wait -PassThru
+          Get-Content install.log -ErrorAction SilentlyContinue | Select-Object -Last 25
+          if ($p.ExitCode -ne 0) { throw "Installer exited with code $($p.ExitCode)" }
+
+      - name: Smoke test, check the install
+        if: steps.build.outcome == 'success'
+        shell: bash
+        run: |
+          app="$(cygpath -u "$LOCALAPPDATA")/Programs/TStamp"
+          test -f "$app/bin/tstamp"
+          bash "$app/bin/tstamp" version
+          n="$(grep -cF '# >>> tstamp >>>' "$HOME/.bashrc" || true)"
+          echo "hook blocks in ~/.bashrc: $n"
+          [ "$n" = 1 ]
+          printf 'type tstamp\nexit\n' | bash --rcfile "$HOME/.bashrc" -i > load.out 2>&1 || true
+          cat load.out
+          grep -q 'tstamp is a function' load.out
+
+      - name: Smoke test, silent uninstall
+        if: steps.build.outcome == 'success'
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\TStamp'
+          $unins = Join-Path $dir 'unins000.exe'
+          if (-not (Test-Path $unins)) { throw "Uninstaller not found at $unins" }
+          Start-Process -FilePath $unins -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          for ($i = 0; $i -lt 60 -and (Test-Path $dir); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path $dir) { throw "TStamp folder still exists after uninstall" }
+
+      - name: Smoke test, check the uninstall
+        if: steps.build.outcome == 'success'
+        shell: bash
+        run: |
+          n="$(grep -cF '# >>> tstamp >>>' "$HOME/.bashrc" || true)"
+          echo "hook blocks left in ~/.bashrc: $n"
+          [ "$n" = 0 ]
+
+      - name: Stop here if any test failed
+        if: steps.tests.outcome == 'failure'
+        shell: bash
+        run: |
+          echo "The test suite failed. See the 'Run the test suite' step." >&2
+          exit 1
+
+      - name: Publish the GitHub Release
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          flags=()
+          if [[ "$VERSION" == *-* ]]; then
+            flags+=(--prerelease)
+          fi
+          notes="Download tstamp-setup-${VERSION}.exe and run it. TStamp needs Git for Windows (Git Bash).
+
+          Windows SmartScreen may warn about this installer because it is not code-signed. Choose More info, then Run anyway. You can check the download against SHA256SUMS.txt."
+          gh release create "$GITHUB_REF_NAME" dist/tstamp-setup-*.exe dist/SHA256SUMS.txt \
+            --title "TStamp $GITHUB_REF_NAME" --notes "$notes" "${flags[@]}"
