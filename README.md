@@ -23,8 +23,21 @@ Working today:
 - Formats: `tstamp format`, `tstamp set`, `tstamp reset`
 - Offline docs: `tstamp help`, `tstamp man`, `tstamp examples`
 - Merged report of all sessions: `tstamp export`
+- Windows installer (Git Bash), built and smoke-tested by GitHub Actions
 
-Not built yet: the installer, other shells.
+Not built yet: other shells (Zsh, Fish, PowerShell, CMD) and Linux or macOS testing.
+
+## Install on Windows
+
+1. Install [Git for Windows](https://git-scm.com/download/win) if you do not
+   have it. TStamp runs inside Git Bash.
+2. Download the `tstamp-setup` file from the
+   [latest release](https://github.com/abinaze/tstamp/releases/latest) and run it.
+3. Open a new Git Bash window and type `tstamp-a`.
+
+The installer is not code-signed, so Windows SmartScreen may warn you. Choose
+More info, then Run anyway. Compare the download with `SHA256SUMS.txt` if you
+want to check it. Uninstall from Windows Settings, Apps.
 
 ## Try it in one terminal
 
