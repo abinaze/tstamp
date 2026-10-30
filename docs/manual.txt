@@ -1,0 +1,204 @@
+NAME
+  tstamp - local-first terminal timestamp utility
+
+SYNOPSIS
+  tstamp [FORMAT]
+  tstamp-a [FORMAT]
+  tstamp set FORMAT
+  tstamp stop | status | format | export | reset
+  tstamp help | man | examples | version
+
+DESCRIPTION
+  TStamp prints a START line before each command you run and an END
+  line when it finishes, with the exit code and duration:
+
+  [T1][2026-10-29 19:42:01.100] START: npm run build
+  Build failed.
+  [T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s
+
+  A small hook loaded into your shell does the work. There is no
+  background service, no network access and no telemetry. Every
+  terminal gets its own session ID (T1, T2, ...), so lines from
+  different terminals can be told apart.
+
+COMMANDS
+  tstamp [FORMAT]
+      Enable tracking in this terminal. FORMAT is a number 1-5 or a
+      custom format string (see FORMATS) and applies to this terminal
+      only. Without FORMAT, the saved default is used. Needs the hook
+      loaded in this terminal (see INSTALLATION).
+
+  tstamp-a [FORMAT]
+      Enable tracking in every terminal that has the hook loaded:
+      existing terminals start at their next prompt, new ones from
+      their first command. With FORMAT, the saved default format is
+      changed first. Global tracking switches itself off after a
+      reboot.
+
+  tstamp stop
+      Stop global tracking and tracking in this terminal. Other
+      terminals that only follow the global setting stop at their next
+      prompt, with no restart. A terminal where you enabled tracking
+      yourself with "tstamp" keeps tracking until you run "tstamp stop"
+      in that terminal.
+
+  tstamp status
+      Show this terminal's state and session ID, the global state, the
+      default format and the live sessions.
+
+  tstamp format
+      List the timestamp formats with live examples. The current
+      default is marked with *.
+
+  tstamp set FORMAT
+      Change the saved default format (a number 1-5 or a custom string).
+
+  tstamp export
+      Planned: merge session logs into one chronological report. Not
+      implemented yet; it exits with status 2.
+
+  tstamp help
+      Show a short command summary.
+
+  tstamp man
+      Show this manual (through "less" when it is available).
+
+  tstamp examples
+      Show usage examples.
+
+  tstamp version
+      Show the installed version.
+
+  tstamp reset
+      Restore the default configuration (default format 4). It does not
+      change the global setting and does not delete logs.
+
+FORMATS
+  ID  Meaning                       Format string
+  --  ----------------------------  ---------------------------
+  1   Hours and minutes             %H:%M
+  2   Hours, minutes, seconds       %H:%M:%S
+  3   Date and time                 %Y-%m-%d %H:%M:%S
+  4   Date, time, milliseconds      %Y-%m-%d %H:%M:%S.%3N
+  5   Date, time, UTC offset        %Y-%m-%d %H:%M:%S %z
+
+  Format 4 is the default. A custom format is any string with at
+  least one % and no line break, written with standard date/strftime
+  codes. Besides the usual codes, %3N gives milliseconds, %6N gives
+  microseconds and %N gives nanoseconds (padded with zeros). Quote
+  custom formats so the shell does not change them:
+
+    tstamp set "%d/%m/%Y %H:%M"
+
+CONFIGURATION
+  State lives in ~/.tstamp. To use another folder, set TSTAMP_HOME
+  before starting the terminal.
+
+  config            Plain key=value file. It currently holds format=.
+  enabled           Exists only while global tracking is on. It records
+                    which boot created it and is ignored after a reboot.
+  sessions/Tn/pid   One folder per live terminal (Tn is its session ID).
+                    IDs of closed terminals are reused.
+  logs/Tn-PID.log   One log file per terminal.
+
+  Format priority in a terminal: its own format (tstamp N), then the
+  saved default, then format 4.
+
+  Reboot detection: where /proc/sys/kernel/random/boot_id exists it is
+  used. Git Bash has none, so the boot time is estimated from the
+  uptime counter instead.
+
+OUTPUT AND LOGS
+  Console lines look like this, with the timestamp in your format:
+
+  [SESSION][TIMESTAMP] START: command
+  [SESSION][TIMESTAMP] END: command | EXIT=code | DURATION=seconds
+
+  Each log file holds one tab-separated line per event: time in
+  microseconds since 1970, session ID, shell PID, START or END, exit
+  code and duration in microseconds (END only), and the command text
+  (tabs and line breaks become spaces).
+
+  The tstamp and tstamp-a commands are not tracked themselves.
+  Commands run while tracking is off are not recorded. A pipeline is
+  recorded as one command, with the exit status the shell reports.
+
+SHELL COMPATIBILITY
+  Status of each combination. Nothing is claimed beyond what is listed.
+
+  Combination                          Status
+  -----------------------------------  ----------------------------------
+  Git Bash on Windows (bash 5.2)       Per-terminal and global tracking
+                                       pass automated tests that drive
+                                       scripted interactive shells. Not
+                                       yet tried by hand in a window.
+                                       Reboot reset only simulated, not
+                                       yet tested with a real restart.
+  Git Bash in Windows Terminal or      Not tested yet.
+  an IDE terminal
+  Bash on Linux or macOS               Not tested yet. macOS ships bash
+                                       3.2, which is too old (4.4 or
+                                       newer is needed).
+  WSL                                  Not tested yet.
+  Zsh, Fish                            Not implemented.
+  PowerShell, CMD                      Not implemented.
+
+EXAMPLES
+  Run "tstamp examples" for a list of ready-to-use commands.
+
+TROUBLESHOOTING
+  "tstamp: another DEBUG trap is already set"
+      Another tool (for example bash-preexec) already uses the shell's
+      DEBUG trap. TStamp will not replace it, so tracking is not
+      installed in that terminal.
+
+  "tstamp: bash 4.4 or newer is required"
+      Your bash is too old. Check it with: bash --version
+
+  tstamp-a changed nothing in an open terminal
+      Only terminals that loaded the hook can follow it. Open a new
+      terminal, or run this in that terminal:
+        source /path/to/tstamp/shells/bash.sh
+
+  A terminal keeps tracking after "tstamp stop" elsewhere
+      That terminal was enabled with "tstamp". Run "tstamp stop" in it.
+
+  Tracking is off after a reboot
+      This is intended. Run tstamp-a again.
+
+  No lines appear
+      Run "tstamp status". Tracking must be on for this terminal, and
+      the "State dir" line must show the folder you expect.
+
+PRIVACY
+  TStamp is local only. It makes no network connections, sends no
+  telemetry and needs no account, cloud service or background service.
+
+  Logs contain the full text of every tracked command, including any
+  passwords or tokens typed on a command line. They are stored
+  unencrypted in ~/.tstamp/logs, and the same text is printed in your
+  terminal. Run "tstamp stop" before typing secrets, and delete old
+  logs when you no longer need them:
+
+    rm -rf ~/.tstamp/logs
+
+INSTALLATION
+  There is no installer yet. To try TStamp in one terminal, run:
+
+    source /path/to/tstamp/shells/bash.sh
+
+  This changes nothing permanently: closing the terminal removes it.
+  A guided installer is planned. It will ask before changing any shell
+  profile, back the profile up first and print rollback instructions.
+
+UNINSTALLATION
+  The current version changes no shell profile. To remove it:
+
+    1. Run "tstamp stop", then close your terminals.
+    2. Delete the state folder:  rm -rf ~/.tstamp
+    3. Delete the tstamp project folder.
+
+LIMITATIONS
+  Not yet tested: full-screen programs (vim, less, ssh), several
+  commands on one line, background jobs and very long-running commands.
+  Only bash is supported. The export command does not exist yet.
