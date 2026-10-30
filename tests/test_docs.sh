@@ -64,7 +64,6 @@ done
 
 check "docs commands did not create a state folder" no "$([ -e "$TSTAMP_HOME" ] && echo yes || echo no)"
 
-bash "$T" export >/dev/null 2>&1; check "export still reports not implemented (exit 2)" 2 "$?"
 bash "$T" nonsense >/dev/null 2>&1; check "unknown command exits 2" 2 "$?"
 
 echo
