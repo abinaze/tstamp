@@ -53,9 +53,12 @@ COMMANDS
   tstamp set FORMAT
       Change the saved default format (a number 1-5 or a custom string).
 
-  tstamp export
-      Planned: merge session logs into one chronological report. Not
-      implemented yet; it exits with status 2.
+  tstamp export [-o FILE] [SESSION...]
+      Merge the session logs into one report in time order, using the
+      saved default format. Give session IDs (for example T1 T2) to
+      include only those sessions. The report goes to the screen, or
+      to FILE with -o (an existing file is never overwritten). Exit
+      status 1 means no matching logs were found.
 
   tstamp help
       Show a short command summary.
@@ -72,6 +75,11 @@ COMMANDS
   tstamp reset
       Restore the default configuration (default format 4). It does not
       change the global setting and does not delete logs.
+
+  tstamp hook add|remove [--yes] [FILE]
+      Add or remove the TStamp block in your Git Bash startup file
+      (default ~/.bashrc), so new terminals load the hook. A backup is
+      made first and nothing changes without your confirmation.
 
 FORMATS
   ID  Meaning                       Format string
@@ -201,4 +209,4 @@ UNINSTALLATION
 LIMITATIONS
   Not yet tested: full-screen programs (vim, less, ssh), several
   commands on one line, background jobs and very long-running commands.
-  Only bash is supported. The export command does not exist yet.
+  Only bash is supported.
