@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TStamp integration for bash (Git Bash first). Source this file; do not execute it.
-# Phase 4: tracking in the current terminal only.
+# Phase 5: per-terminal tracking plus global tracking (tstamp-a, tstamp stop).
 # This file is sourced into an interactive shell, so it must never use
 # "set -e" or "set -u".
 
@@ -37,8 +37,11 @@ source "$__TSTAMP_ROOT/lib/config.sh"
 source "$__TSTAMP_ROOT/lib/format.sh"
 # shellcheck source=/dev/null
 source "$__TSTAMP_ROOT/lib/clock.sh"
+# shellcheck source=/dev/null
+source "$__TSTAMP_ROOT/lib/state.sh"
 
 __TSTAMP_LOADED=1
+tstamp_boot_token           # reboot token, computed once per terminal
 __tstamp_local=0            # 1 = tracking is on in this terminal
 __tstamp_local_fmt=""       # format chosen with "tstamp N" (empty = use default)
 __tstamp_armed=0            # 1 = next DEBUG event is a user command
@@ -53,6 +56,15 @@ __tstamp_last_hist=""
 
 __tstamp_setret() {
   return "${1:-0}"
+}
+
+# Succeeds if this terminal should track the next command:
+# tracking was enabled here, or the global flag is on for this boot.
+__tstamp_enabled() {
+  [ "$__tstamp_local" = 1 ] && return 0
+  [ -e "$TSTAMP_HOME/enabled" ] || return 1
+  tstamp_global_state
+  [ "$TSTAMP_GLOBAL" = on ]
 }
 
 # Claim the lowest free session ID (T1, T2, ...). Slots whose shell has
@@ -138,7 +150,7 @@ __tstamp_debug() {
   local rc=$? last="${1:-}" cmd="${2:-}"
   if [ "$__tstamp_armed" = 1 ] && [ -z "${COMP_POINT:-}" ]; then
     __tstamp_armed=0
-    if [ "$__tstamp_local" = 1 ]; then
+    if __tstamp_enabled; then
       __tstamp_start "$cmd"
     fi
   fi
@@ -191,22 +203,32 @@ tstamp() {
     stop)
       __tstamp_local=0
       __tstamp_local_fmt=""
-      echo "Tracking stopped in this terminal."
+      tstamp_global_disable
+      echo "Tracking stopped globally and in this terminal."
       ;;
     status)
       local state=off
-      [ "$__tstamp_local" = 1 ] && state=on
+      if [ "$__tstamp_local" = 1 ]; then
+        state=on
+      elif __tstamp_enabled; then
+        state="on (global)"
+      fi
       __tstamp_resolve_format
       printf 'This terminal : %s\n' "$state"
       printf 'Session ID    : %s\n' "${__tstamp_sid:-not assigned yet}"
-      printf 'Format        : %s\n' "$__tstamp_fmt"
+      printf 'Format here   : %s\n' "$__tstamp_fmt"
       printf 'State dir     : %s\n' "$TSTAMP_HOME"
-      printf 'Global        : not available yet (Phase 5)\n'
+      tstamp_print_global_status
       ;;
     *)
       TSTAMP_HOME="$TSTAMP_HOME" command "$__TSTAMP_ROOT/bin/tstamp" "$@"
       ;;
   esac
+}
+
+# Enable tracking in every terminal that has the hook loaded.
+tstamp-a() {
+  tstamp_cmd_global_on "$@"
 }
 
 __tstamp_install() {
