@@ -39,7 +39,7 @@ check() { # description, expected, actual
 has   "iss: per-user install, no admin prompt" "$ISS" 'PrivilegesRequired=lowest'
 hasnt "iss: never asks for admin" "$ISS" 'PrivilegesRequired=admin'
 has   "iss: installs under the per-user program folder" "$ISS" 'DefaultDirName={autopf}\TStamp'
-has   "iss: output name carries the version" "$ISS" 'OutputBaseFilename=tstamp-setup-{#MyAppVersion}'
+has   "iss: output name carries the version" "$ISS" 'OutputBaseFilename=tstamp-windows-setup'
 has   "iss: installs the staged files" "$ISS" 'Source: "..\dist\stage\*"'
 has   "iss: bashrc edit is a task the user can untick" "$ISS" 'Name: "bashhook"'
 has   "iss: calls hook add" "$ISS" "RunTstamp('add')"
