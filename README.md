@@ -66,6 +66,7 @@ Nothing is installed permanently. Closing the terminal removes it.
 - `shells/` shell integrations
 - `docs/`   help, examples and the offline manual
 - `installer/` Windows installer script and staging
+- `site/` project website (static HTML, CSS and JS; no build step)
 - `tests/`  test scripts (`bash tests/run_all.sh` runs them all)
 
 ## Documentation
