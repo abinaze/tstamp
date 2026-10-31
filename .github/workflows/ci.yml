@@ -57,3 +57,32 @@ jobs:
             fi
           done
           exit "$status"
+
+      - name: Install and remove the .deb (Ubuntu only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          bash installer/build-deb.sh
+          sudo apt-get install -y ./dist/tstamp.deb
+          tstamp version
+          tstamp-a 2
+          tstamp status
+          tstamp stop
+          tstamp hook add --yes "$HOME/.bashrc"
+          tstamp hook remove --yes "$HOME/.bashrc"
+          sudo apt-get remove -y tstamp
+          test ! -e /usr/bin/tstamp
+          test ! -e /usr/share/tstamp
+
+      - name: Run install.sh with the built-in bash 3.2 (macOS only)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          /bin/bash --version | head -n 1
+          bash installer/build-unix.sh
+          d="$(mktemp -d)"
+          tar -xzf dist/tstamp-unix.tar.gz -C "$d"
+          HOME="$d/home" /bin/bash "$d"/tstamp-*/install.sh --prefix "$d/share/tstamp" --bin "$d/bin" --no-hook
+          "$d/bin/tstamp" version
+          HOME="$d/home" /bin/bash "$d/share/tstamp/uninstall.sh" </dev/null
+          test ! -e "$d/share/tstamp/bin"
