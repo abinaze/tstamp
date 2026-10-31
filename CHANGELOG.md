@@ -29,6 +29,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Separate packages per system: Windows installer, Debian package, and a
   Unix tarball with install and uninstall scripts for Linux, macOS and WSL.
 - Web installer (`get.sh`) that verifies a checksum before installing.
+- Project website in `site/`. It detects the visitor's system and shows only
+  that system's install steps, loads nothing from third parties and enforces a
+  strict Content-Security-Policy.
 
 ### Fixed
 
