@@ -117,3 +117,15 @@ based only on what these tests, locally or in CI, have shown.
 - Full-screen programs, background jobs and several commands on one line
   are not tested yet.
 - The reboot reset is simulated, not yet verified with a real restart.
+
+## Releases
+
+The `Release` workflow (`.github/workflows/release.yml`) first calls the CI
+workflow, so the tests must pass on Ubuntu, macOS and Windows. It then
+builds the Windows installer, the Debian package, the Unix tarball and the web
+installer, and smoke-tests the Windows installer with a silent install and
+uninstall. On a tag it creates a draft release and attaches every file plus
+`SHA256SUMS.txt`. It never publishes; see `docs/RELEASING.md`.
+
+File names carry no version, so the `releases/latest/download/<file>` links
+used by the README and the website keep working.
