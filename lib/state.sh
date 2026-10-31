@@ -8,7 +8,7 @@
 #   ts:<epoch>           (boot time estimated from /proc/uptime, for example Git Bash)
 #   none                 (cannot be determined; the global flag then never expires)
 tstamp_boot_token() {
-  local id up rest now
+  local id up rest now re
   if [ -r /proc/sys/kernel/random/boot_id ]; then
     read -r id < /proc/sys/kernel/random/boot_id
     TSTAMP_BOOT="id:$id"
@@ -20,6 +20,14 @@ tstamp_boot_token() {
     now="${EPOCHSECONDS:-$(date +%s)}"
     if [[ "$up" =~ ^[0-9]+$ ]]; then
       TSTAMP_BOOT="ts:$(( now - up ))"
+      return 0
+    fi
+  fi
+  if command -v sysctl >/dev/null 2>&1; then
+    up="$(sysctl -n kern.boottime 2>/dev/null)"
+    re='sec = ([0-9]+)'
+    if [[ "$up" =~ $re ]]; then
+      TSTAMP_BOOT="ts:${BASH_REMATCH[1]}"
       return 0
     fi
   fi
