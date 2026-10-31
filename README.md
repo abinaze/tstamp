@@ -54,4 +54,21 @@ Nothing is installed permanently. Closing the terminal removes it.
 - `lib/`    shared core (config, formats, clock, state)
 - `shells/` shell integrations
 - `docs/`   help, examples and the offline manual
+- `installer/` Windows installer script and staging
 - `tests/`  test scripts (`bash tests/run_all.sh` runs them all)
+
+## Documentation
+
+- `tstamp man` shows the full offline manual ([docs/manual.txt](docs/manual.txt))
+- [Architecture](docs/ARCHITECTURE.md): how tracking, state and the installer work
+- [Changelog](CHANGELOG.md)
+
+## Contributing
+
+Bug reports and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+first, and see the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues go
+through [SECURITY.md](SECURITY.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
