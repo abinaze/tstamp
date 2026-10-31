@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Static checks for the installer script and the build workflow.
+# Static checks for the installer script and the build workflows.
 # They do NOT compile the installer; they catch typos and drift between
 # files. The real test is the workflow run on GitHub.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ISS="$ROOT/installer/tstamp.iss"
-WF="$ROOT/.github/workflows/installer.yml"
+REL="$ROOT/.github/workflows/release.yml"
+CI="$ROOT/.github/workflows/ci.yml"
 STAGE="$ROOT/installer/stage.sh"
 
 pass=0
@@ -39,7 +40,7 @@ check() { # description, expected, actual
 has   "iss: per-user install, no admin prompt" "$ISS" 'PrivilegesRequired=lowest'
 hasnt "iss: never asks for admin" "$ISS" 'PrivilegesRequired=admin'
 has   "iss: installs under the per-user program folder" "$ISS" 'DefaultDirName={autopf}\TStamp'
-has   "iss: output name carries the version" "$ISS" 'OutputBaseFilename=tstamp-windows-setup'
+has   "iss: output file name has no version in it" "$ISS" 'OutputBaseFilename=tstamp-windows-setup'
 has   "iss: installs the staged files" "$ISS" 'Source: "..\dist\stage\*"'
 has   "iss: bashrc edit is a task the user can untick" "$ISS" 'Name: "bashhook"'
 has   "iss: calls hook add" "$ISS" "RunTstamp('add')"
@@ -49,19 +50,40 @@ has   "iss: stops cleanly when Git Bash is missing" "$ISS" 'Install Git for Wind
 has   "iss: deleting user data defaults to No" "$ISS" 'MB_DEFBUTTON2'
 has   "stage.sh writes where the installer script reads" "$STAGE" 'dist/stage'
 
-# --- workflow ---
-has   "workflow: can be started by hand" "$WF" 'workflow_dispatch:'
-has   "workflow: tag trigger" "$WF" '      - "v*"'
-has   "workflow: compiles the installer script" "$WF" 'installer\tstamp.iss'
-has   "workflow: passes the version to the compiler" "$WF" '/DMyAppVersion='
-has   "workflow: runs the test suite" "$WF" 'tests/test_*.sh'
-has   "workflow: smoke-tests a silent install" "$WF" '/VERYSILENT'
-has   "workflow: writes checksums" "$WF" 'sha256sum'
-has   "workflow: publishes only for tags" "$WF" "if: github.ref_type == 'tag'"
-has   "workflow: publishes with gh" "$WF" 'gh release create'
-hasnt "workflow: avoids pull_request_target" "$WF" 'pull_request_target'
-check "workflow: write permission appears once" 1 "$(grep -cF 'contents: write' "$WF")"
-check "workflow: no tab characters" 0 "$(tr -cd '\t' < "$WF" | wc -c | tr -d ' ')"
+# --- old Windows-only workflow is gone ---
+check "installer.yml is gone (release.yml replaces it)" no "$([ -e "$ROOT/.github/workflows/installer.yml" ] && echo yes || echo no)"
+
+# --- release workflow ---
+has   "release: can be started by hand" "$REL" 'workflow_dispatch:'
+has   "release: tag trigger" "$REL" '      - "v*"'
+has   "release: runs the CI tests first" "$REL" 'uses: ./.github/workflows/ci.yml'
+has   "release: compiles the installer script" "$REL" 'installer\tstamp.iss'
+has   "release: passes the version to the compiler" "$REL" '/DMyAppVersion='
+has   "release: smoke-tests a silent install" "$REL" '/VERYSILENT'
+has   "release: builds the tarball" "$REL" 'installer/build-unix.sh'
+has   "release: builds the .deb" "$REL" 'installer/build-deb.sh'
+has   "release: ships get.sh" "$REL" 'dist/get.sh'
+has   "release: writes checksums" "$REL" 'SHA256SUMS.txt'
+has   "release: creates the release as a draft" "$REL" '--draft'
+has   "release: only touches releases for tags" "$REL" "if: github.ref_type == 'tag'"
+has   "release: creates with gh" "$REL" 'gh release create'
+has   "release: uploads with gh" "$REL" 'gh release upload'
+has   "release: verifies the tag exists" "$REL" '--verify-tag'
+has   "release: Windows file name" "$REL" 'tstamp-windows-setup.exe'
+has   "release: Unix file name" "$REL" 'tstamp-unix.tar.gz'
+has   "release: Debian file name" "$REL" 'tstamp.deb'
+hasnt "release: avoids pull_request_target" "$REL" 'pull_request_target'
+hasnt "release: never publishes by itself" "$REL" '--draft=false'
+check "release: write access only in the 4 jobs that need it" 4 "$(grep -cF 'contents: write' "$REL")"
+check "release: read-only by default" 1 "$(grep -c '^  contents: read$' "$REL")"
+check "release: no tab characters" 0 "$(tr -cd '\t' < "$REL" | wc -c | tr -d ' ')"
+
+# --- test workflow ---
+has   "ci: can be started by hand" "$CI" 'workflow_dispatch:'
+has   "ci: can be called by the release workflow" "$CI" 'workflow_call:'
+has   "ci: runs the test suite" "$CI" 'tests/test_*.sh'
+check "ci: read-only" 0 "$(grep -cF 'contents: write' "$CI")"
+check "ci: no tab characters" 0 "$(tr -cd '\t' < "$CI" | wc -c | tr -d ' ')"
 
 echo
 echo "passed=$pass failed=$fail"
