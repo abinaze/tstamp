@@ -1,0 +1,235 @@
+name: Release
+
+# Builds every package. Nothing here publishes a release.
+# - Push a tag such as v0.1.0 (it must match the VERSION file): the tests run
+#   on three systems, every package is built and smoke-tested, and a DRAFT
+#   release is created with all files and SHA256SUMS.txt. You review the
+#   draft on GitHub and press "Publish release" yourself.
+# - Start it by hand (Actions tab, Release, Run workflow): same builds and
+#   tests, but no release is created.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests
+    uses: ./.github/workflows/ci.yml
+
+  draft:
+    name: Check the version and create the draft release
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Check the version
+        id: ver
+        shell: bash
+        run: |
+          v="$(tr -d '\r\n' < VERSION)"
+          if ! [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "VERSION '$v' is not a valid version" >&2
+            exit 1
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the VERSION file (v$v)" >&2
+            exit 1
+          fi
+
+      - name: Create the draft release
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          flags=()
+          if [[ "$VERSION" == *-* ]]; then
+            flags+=(--prerelease)
+          fi
+          notes="Download only the file for your system:
+
+          - Windows: tstamp-windows-setup.exe (needs Git for Windows)
+          - Debian and Ubuntu: tstamp.deb
+          - Linux, macOS and WSL: tstamp-unix.tar.gz, or run get.sh
+
+          Windows SmartScreen may warn about the installer because it is not code-signed. Check any download against SHA256SUMS.txt. See the README for install steps."
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag \
+            --title "TStamp $GITHUB_REF_NAME" --notes "$notes" "${flags[@]}"
+
+  windows:
+    name: Windows installer
+    needs: [tests, draft]
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    outputs:
+      sums: ${{ steps.sums.outputs.sums }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Stage the files to install
+        shell: bash
+        run: bash installer/stage.sh
+
+      - name: Find or install Inno Setup
+        id: inno
+        shell: pwsh
+        run: |
+          $paths = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+          )
+          $found = $paths | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $found) {
+            Write-Host "Inno Setup not preinstalled; installing with Chocolatey"
+            choco install innosetup --no-progress -y
+            $found = $paths | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          if (-not $found) { throw "ISCC.exe was not found" }
+          Write-Host "Using $found"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "iscc=$found"
+
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          & "${{ steps.inno.outputs.iscc }}" "/DMyAppVersion=${{ needs.draft.outputs.version }}" installer\tstamp.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+          Get-ChildItem dist\*.exe
+
+      - name: Checksum
+        id: sums
+        shell: bash
+        run: |
+          cd dist
+          {
+            echo "sums<<SUMS_EOF"
+            sha256sum tstamp-windows-setup.exe
+            echo "SUMS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test, silent install
+        shell: pwsh
+        run: |
+          $setup = (Get-ChildItem dist\tstamp-windows-setup.exe | Select-Object -First 1).FullName
+          $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/LOG=install.log' -Wait -PassThru
+          Get-Content install.log -ErrorAction SilentlyContinue | Select-Object -Last 25
+          if ($p.ExitCode -ne 0) { throw "Installer exited with code $($p.ExitCode)" }
+
+      - name: Smoke test, check the install
+        shell: bash
+        run: |
+          app="$(cygpath -u "$LOCALAPPDATA")/Programs/TStamp"
+          test -f "$app/bin/tstamp"
+          bash "$app/bin/tstamp" version
+          n="$(grep -cF '# >>> tstamp >>>' "$HOME/.bashrc" || true)"
+          echo "hook blocks in ~/.bashrc: $n"
+          [ "$n" = 1 ]
+          printf 'type tstamp\nexit\n' | bash --rcfile "$HOME/.bashrc" -i > load.out 2>&1 || true
+          cat load.out
+          grep -q 'tstamp is a function' load.out
+
+      - name: Smoke test, silent uninstall
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\TStamp'
+          $unins = Join-Path $dir 'unins000.exe'
+          if (-not (Test-Path $unins)) { throw "Uninstaller not found at $unins" }
+          Start-Process -FilePath $unins -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          for ($i = 0; $i -lt 60 -and (Test-Path $dir); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path $dir) { throw "TStamp folder still exists after uninstall" }
+
+      - name: Smoke test, check the uninstall
+        shell: bash
+        run: |
+          n="$(grep -cF '# >>> tstamp >>>' "$HOME/.bashrc" || true)"
+          echo "hook blocks left in ~/.bashrc: $n"
+          [ "$n" = 0 ]
+
+      - name: Attach the installer to the draft release
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" dist/tstamp-windows-setup.exe --clobber
+
+  unix:
+    name: Linux, macOS and WSL packages
+    needs: [tests, draft]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sums: ${{ steps.sums.outputs.sums }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Build the tarball, the .deb and the web installer
+        shell: bash
+        run: |
+          bash installer/build-unix.sh
+          bash installer/build-deb.sh
+          cp installer/get.sh dist/get.sh
+          ls -l dist
+
+      - name: Check the packages
+        shell: bash
+        run: |
+          dpkg-deb -I dist/tstamp.deb | head -n 12
+          tar -tzf dist/tstamp-unix.tar.gz | head -n 8
+          bash -n dist/get.sh
+
+      - name: Checksums
+        id: sums
+        shell: bash
+        run: |
+          cd dist
+          {
+            echo "sums<<SUMS_EOF"
+            sha256sum tstamp-unix.tar.gz tstamp.deb get.sh
+            echo "SUMS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Attach the packages to the draft release
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" dist/tstamp-unix.tar.gz dist/tstamp.deb dist/get.sh --clobber
+
+  finish:
+    name: Add checksums to the draft release
+    needs: [draft, windows, unix]
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Write SHA256SUMS.txt and attach it
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          WIN_SUMS: ${{ needs.windows.outputs.sums }}
+          UNIX_SUMS: ${{ needs.unix.outputs.sums }}
+        run: |
+          printf '%s\n%s\n' "$WIN_SUMS" "$UNIX_SUMS" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          test "$(wc -l < SHA256SUMS.txt)" -eq 4
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS.txt --clobber
+          echo "Draft release is ready. Review it at https://github.com/$GITHUB_REPOSITORY/releases and press Publish release when you are happy."
