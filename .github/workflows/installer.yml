@@ -99,7 +99,7 @@ jobs:
       - name: Upload the installer
         continue-on-error: true
         if: steps.build.outcome == 'success'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tstamp-setup-${{ steps.ver.outputs.version }}
           path: |
