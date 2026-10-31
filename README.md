@@ -28,17 +28,27 @@ Working today:
 
 Not built yet: other shells (Zsh, Fish, PowerShell, CMD) and Linux or macOS testing.
 
-## Install on Windows
+## Install
 
-1. Install [Git for Windows](https://git-scm.com/download/win) if you do not
-   have it. TStamp runs inside Git Bash.
-2. Download the `tstamp-setup` file from the
-   [latest release](https://github.com/abinaze/tstamp/releases/latest) and run it.
-3. Open a new Git Bash window and type `tstamp-a`.
+Pick your system. Each system has its own package, and you only need yours.
 
-The installer is not code-signed, so Windows SmartScreen may warn you. Choose
-More info, then Run anyway. Compare the download with `SHA256SUMS.txt` if you
-want to check it. Uninstall from Windows Settings, Apps.
+| System | Package | How |
+|---|---|---|
+| Windows (Git Bash) | `tstamp-windows-setup.exe` | Download from the [latest release](https://github.com/abinaze/tstamp/releases/latest) and run it |
+| Debian, Ubuntu | `tstamp.deb` | `sudo apt install ./tstamp.deb`, then `tstamp hook add` |
+| Linux, macOS, WSL | `tstamp-unix.tar.gz` | The one-line command below, or unpack and run `bash install.sh` |
+
+Linux, macOS and WSL, no sudo needed:
+
+    curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash
+
+The Windows installer is not code-signed, so Windows SmartScreen may warn you.
+Choose More info, then Run anyway. Every release has a `SHA256SUMS.txt` to check
+your download. TStamp supports bash only. On macOS, install a current bash with
+`brew install bash` and start it with `bash`, because Terminal opens zsh.
+
+Uninstall: Windows Settings, Apps on Windows; `sudo apt remove tstamp` on
+Debian and Ubuntu; `bash ~/.local/share/tstamp/uninstall.sh` elsewhere.
 
 ## Try it in one terminal
 
