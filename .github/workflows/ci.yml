@@ -1,0 +1,59 @@
+name: CI
+
+# Runs the test suite on Ubuntu, macOS and Windows (Git Bash).
+# Starts by hand: Actions tab, CI, Run workflow.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests on ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu
+            os: ubuntu-latest
+          - name: macOS
+            os: macos-latest
+          - name: Windows (Git Bash)
+            os: windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Use a current bash on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install bash
+          echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
+
+      - name: Show the environment
+        shell: bash
+        run: |
+          bash --version | head -n 1
+          uname -srm
+          date +"%Y-%m-%d %H:%M:%S" || true
+          date +"%3N" || true
+
+      - name: Run the tests
+        shell: bash
+        run: |
+          status=0
+          for t in tests/test_*.sh; do
+            echo "== $t"
+            rc=0
+            out="$(bash "$t" 2>&1)" || rc=$?
+            printf '%s\n' "$out" | grep -E '^(FAIL|passed)' || true
+            if [ "$rc" -ne 0 ]; then
+              status=1
+              echo "-- last lines of $t (exit $rc):"
+              printf '%s\n' "$out" | tail -n 12
+            fi
+          done
+          exit "$status"
