@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+  - type: dropdown
+    id: shell
+    attributes:
+      label: Which shell is this for?
+      options:
+        - Git Bash
+        - Bash on Linux
+        - Bash on macOS
+        - WSL
+        - Zsh
+        - Fish
+        - PowerShell
+        - CMD
+        - Not shell specific
+    validations:
+      required: true
