@@ -26,6 +26,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Automated test suite, run in CI on Ubuntu, macOS (current Homebrew
   bash) and Windows (Git Bash).
 - MIT license and contributor documentation.
+- Separate packages per system: Windows installer, Debian package, and a
+  Unix tarball with install and uninstall scripts for Linux, macOS and WSL.
+- Web installer (`get.sh`) that verifies a checksum before installing.
 
 ### Fixed
 
