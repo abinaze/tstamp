@@ -38,9 +38,15 @@ check "clock_now never goes backwards" yes "$([ "$b" -ge "$a" ] && echo yes || e
 US=1700000000123456
 for id in 1 2 3 4 5; do
   f="$(tstamp_format_string "$id")"
-  expected="$(date -d @1700000000.123456 +"$f")"
+  case "$id" in
+    1) expected='22:13' ;;
+    2) expected='22:13:20' ;;
+    3) expected='2023-11-14 22:13:20' ;;
+    4) expected='2023-11-14 22:13:20.123' ;;
+    5) expected='2023-11-14 22:13:20 +0000' ;;
+  esac
   tstamp_clock_format "$US" "$f"
-  check "format $id matches date" "$expected" "$TSTAMP_OUT"
+  check "format $id gives the expected text" "$expected" "$TSTAMP_OUT"
 done
 
 tstamp_clock_format "$US" '%Y-%m-%d %H:%M:%S.%3N'
