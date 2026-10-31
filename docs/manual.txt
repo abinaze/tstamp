@@ -194,42 +194,69 @@ PRIVACY
     rm -rf ~/.tstamp/logs
 
 INSTALLATION
-  Windows installer (Git Bash)
+  Pick the section for your system. You only need that one.
+
+  Windows (Git Bash)
     1. Install Git for Windows if you do not have it, because TStamp
        runs inside Git Bash: https://git-scm.com/download/win
-    2. Open https://github.com/abinaze/tstamp/releases/latest, download
-       the tstamp-setup file and run it. Windows SmartScreen may warn
-       because the installer is not code-signed: choose More info, then
-       Run anyway. SHA256SUMS.txt on the same page lets you check the
-       download.
+    2. Download tstamp-windows-setup.exe from
+       https://github.com/abinaze/tstamp/releases/latest and run it.
+       Windows SmartScreen may warn because the installer is not
+       code-signed: choose More info, then Run anyway.
     3. Leave "Load TStamp in every new Git Bash window" ticked. The
-       installer first backs up ~/.bashrc, then adds a short block
+       installer backs up ~/.bashrc first, then adds a short block
        between "# >>> tstamp >>>" and "# <<< tstamp <<<".
     4. Open a new Git Bash window and type: tstamp-a
+    No administrator rights are needed. Files go to
+    %LOCALAPPDATA%\Programs\TStamp.
 
-  The installer needs no administrator rights and installs into
-  %LOCALAPPDATA%\Programs\TStamp.
+  Debian and Ubuntu
+    1. Download tstamp.deb from the latest release page.
+    2. Run: sudo apt install ./tstamp.deb
+    3. Run once: tstamp hook add
+    4. Open a new bash window and type: tstamp-a
 
-  Without the installer
+  Linux, macOS and WSL, without sudo
+    Run:
+      curl -fsSL \
+        https://github.com/abinaze/tstamp/releases/latest/download/get.sh \
+        | bash
+    This downloads tstamp-unix.tar.gz, checks it against
+    SHA256SUMS.txt, and installs for your user in ~/.local. The checksum
+    catches damaged downloads only. It edits no startup file unless you
+    add "-s -- --hook" after "bash". Or unpack tstamp-unix.tar.gz and
+    run: bash install.sh
+    After installing, run "tstamp hook add" if you did not use --hook.
+
+  macOS
+    The built-in bash 3.2 is too old, and Terminal opens zsh, which
+    TStamp does not support yet. Install a current bash with
+    "brew install bash", then start it by typing: bash
+
+  Without a package
     To try TStamp in one terminal (closing it removes everything):
       source /path/to/tstamp/shells/bash.sh
-    To load it in every new Git Bash window, run: tstamp hook add
 
 UNINSTALLATION
-  With the installer
+  Windows
     Open Windows Settings, then Apps, find TStamp and choose Uninstall.
     It removes the block from ~/.bashrc (after a backup) and deletes the
     program files. It asks whether to delete your settings and logs in
     ~/.tstamp; the default answer is No.
 
-  Without the installer
-    1. If you ran "tstamp hook add", run: tstamp hook remove
-    2. Run "tstamp stop", then close your terminals.
-    3. Delete ~/.tstamp and the tstamp project folder.
+  Debian and Ubuntu
+    Run "tstamp hook remove", then: sudo apt remove tstamp
 
-  Backups of ~/.bashrc stay next to it, named like
-  .bashrc.tstamp-backup-DATE-TIME. Delete them when you no longer
-  need them.
+  Linux, macOS and WSL (install.sh or get.sh)
+    Run: bash ~/.local/share/tstamp/uninstall.sh
+    It removes the startup-file block (after a backup), the tstamp and
+    tstamp-a commands and the program files, then asks before deleting
+    ~/.tstamp (default: No).
+
+  Any system
+    Backups of your startup file stay next to it, named like
+    .bashrc.tstamp-backup-DATE-TIME. Delete them when you no longer
+    need them.
 
 LIMITATIONS
   Not yet tested: full-screen programs (vim, less, ssh), several
