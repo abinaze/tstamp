@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/brand/svg/tstamp-horizontal-light.svg">
-    <img alt="tstamp" src="assets/brand/svg/tstamp-horizontal-dark.svg" width="300">
+    <img alt="tstamp" src="assets/brand/png/tstamp-horizontal-dark.png" width="300">
   </picture>
 </p>
 
