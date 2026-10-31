@@ -136,18 +136,21 @@ SHELL COMPATIBILITY
 
   Combination                          Status
   -----------------------------------  ----------------------------------
-  Git Bash 5.2, Windows build 26100    Automated tests pass: per-terminal
-                                       and global tracking, export, hook.
-                                       Installer not yet run by hand.
-  Git Bash on a GitHub-hosted          Full test suite, silent install and
-  Windows runner                       silent uninstall passed in CI.
-  Reboot reset                         Simulated only; not tested with a
-                                       real restart.
+  Git Bash on Windows (this PC)        Full test suite passes. Installer
+                                       not yet run by hand.
+  Git Bash on GitHub-hosted Windows    Full test suite passes in CI.
+                                       Silent install and uninstall of
+                                       the installer pass in CI.
+  Bash on Ubuntu (GitHub-hosted)       Full test suite passes in CI.
+  Bash on macOS (GitHub-hosted),       Full test suite passes in CI.
+  current Homebrew bash                The built-in bash 3.2 is too old
+                                       and is not supported.
+  Reboot reset                         Boot markers are checked on all
+                                       three systems, but a real restart
+                                       has not been tested.
   Git Bash in Windows Terminal or      Not tested yet.
   an IDE terminal
-  Bash on Linux or macOS               Not tested yet. macOS ships bash
-                                       3.2, which is too old (4.4+).
-  WSL                                  Not tested yet.
+  WSL and other Linux distributions    Not tested yet.
   Zsh, Fish                            Not implemented.
   PowerShell, CMD                      Not implemented.
 
