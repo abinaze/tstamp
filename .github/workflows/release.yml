@@ -190,8 +190,11 @@ jobs:
       - name: Check the packages
         shell: bash
         run: |
-          dpkg-deb -I dist/tstamp.deb | head -n 12
-          tar -tzf dist/tstamp-unix.tar.gz | head -n 8
+          dpkg-deb -I dist/tstamp.deb > deb-info.txt
+          head -n 12 deb-info.txt
+          tar -tzf dist/tstamp-unix.tar.gz > tar-list.txt
+          head -n 8 tar-list.txt
+          test "$(wc -l < tar-list.txt)" -gt 10
           bash -n dist/get.sh
 
       - name: Checksums
