@@ -74,6 +74,7 @@ has   "release: Unix file name" "$REL" 'tstamp-unix.tar.gz'
 has   "release: Debian file name" "$REL" 'tstamp.deb'
 hasnt "release: avoids pull_request_target" "$REL" 'pull_request_target'
 hasnt "release: never publishes by itself" "$REL" '--draft=false'
+hasnt "release: no pipe into head (SIGPIPE fails a step under pipefail)" "$REL" '| head'
 check "release: write access only in the 4 jobs that need it" 4 "$(grep -cF 'contents: write' "$REL")"
 check "release: read-only by default" 1 "$(grep -c '^  contents: read$' "$REL")"
 check "release: no tab characters" 0 "$(tr -cd '\t' < "$REL" | wc -c | tr -d ' ')"
