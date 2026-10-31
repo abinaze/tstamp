@@ -38,6 +38,14 @@ rc() { "$@" >/dev/null 2>&1; echo "$?"; }
 tstamp_boot_token
 check_match "boot token has a known kind" '^(id:.+|ts:[0-9]+|none)$' "$TSTAMP_BOOT"
 
+# --- the boot marker is a real one on this platform ---
+case "$(uname -s)" in
+  Linux) kind='^id:.+' ;;
+  Darwin|MINGW*|MSYS*|CYGWIN*) kind='^ts:[0-9]+$' ;;
+  *) kind='^(id:.+|ts:[0-9]+|none)$' ;;
+esac
+check_match "boot marker on $(uname -s) is not 'unknown'" "$kind" "$TSTAMP_BOOT"
+
 # --- boot comparison ---
 check "same id" 0 "$(rc tstamp_boot_same id:abc id:abc)"
 check "different id" 1 "$(rc tstamp_boot_same id:abc id:xyz)"
