@@ -1,0 +1,58 @@
+name: Bug report
+description: Something does not work as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please do not paste secrets: TStamp logs
+        contain the full text of your commands.
+  - type: input
+    id: version
+    attributes:
+      label: TStamp version
+      description: Output of `tstamp version`
+    validations:
+      required: true
+  - type: dropdown
+    id: shell
+    attributes:
+      label: Shell
+      options:
+        - Git Bash
+        - Bash on Linux
+        - Bash on macOS
+        - WSL
+        - Other (say which below)
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and shell version
+      description: For example Windows 11 build 26100 and bash 5.2.37
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: Output of `tstamp status`
+      render: text
