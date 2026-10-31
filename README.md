@@ -13,8 +13,9 @@ No cloud accounts, telemetry, AI APIs or background service are required.
 
 ## Status
 
-Early development. Bash on Git Bash (Windows) is the only supported
-shell. Other shells and operating systems are not tested yet.
+Early development. Bash is the only supported shell. It passes the full test
+suite in CI on Windows (Git Bash), Ubuntu and macOS (current Homebrew bash).
+Zsh, Fish, PowerShell and CMD are not supported yet.
 
 Working today:
 
