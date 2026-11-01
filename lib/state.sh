@@ -91,6 +91,7 @@ tstamp_sessions_live() {
   local d pid
   for d in "$TSTAMP_HOME"/sessions/T*; do
     [ -d "$d" ] || continue
+    [ -f "$d/kind" ] && continue
     pid=""
     [ -f "$d/pid" ] && read -r pid < "$d/pid"
     if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
