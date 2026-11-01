@@ -5,28 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src https://api.github.com; base-uri 'none'; form-action 'none'">
 <title>TStamp: timestamp every command in your terminal</title>
-<meta name="description" content="TStamp prints a start and an end timestamp, the exit code and the duration around every command in your terminal. Local only: no account, no telemetry, no background service.">
-<meta name="theme-color" content="#0b0f14">
+<meta name="description" content="tstamp adds a start time, an end time, the result and the duration to every command in your terminal. Free, open source, local only.">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
+<script src="theme.js"></script>
 <script src="app.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="site-header">
+<header class="header">
   <div class="wrap bar">
-    <a class="brand" href="#top" aria-label="TStamp home"><span class="brand-mark" aria-hidden="true">[T]</span>tstamp</a>
-    <nav aria-label="Main">
+    <a class="brand" href="#top" aria-label="tstamp home"><img class="logo-on-light" src="logo-dark.svg" alt="tstamp" width="146" height="38"><img class="logo-on-dark" src="logo-light.svg" alt="" width="146" height="38"></a>
+    <button class="menu" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" aria-label="Main">
       <ul>
+        <li><a href="#try">Demo</a></li>
         <li><a href="#install">Install</a></li>
-        <li><a href="#features">Features</a></li>
         <li><a href="#commands">Commands</a></li>
-        <li><a href="#compatibility">Compatibility</a></li>
-        <li><a href="#docs">Docs</a></li>
-        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#compat">Compatibility</a></li>
+        <li><a href="https://github.com/abinaze/tstamp/blob/main/docs/README.md" rel="noopener">Docs</a></li>
         <li><a href="https://github.com/abinaze/tstamp" rel="noopener">GitHub</a></li>
       </ul>
+      <button class="theme" id="theme-toggle" type="button" aria-label="Switch to dark theme">Dark</button>
     </nav>
   </div>
 </header>
@@ -34,202 +36,153 @@
 <main id="main">
 
 <section class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="eyebrow">Open source &middot; MIT &middot; Local first</p>
-      <h1>Know exactly when every command ran.</h1>
-      <p class="lead">TStamp prints a start and an end timestamp, the exit code and the duration around every command in your terminal. No account, no telemetry, no background service.</p>
-      <div class="cta">
-        <a id="primary-cta" class="btn btn-primary" href="#install">See install options</a>
-        <a class="btn btn-ghost" href="https://github.com/abinaze/tstamp" rel="noopener">View on GitHub</a>
-      </div>
-      <p class="meta" id="hero-meta">MIT license &middot; works in bash on Windows, Linux and macOS</p>
-    </div>
-    <figure class="terminal">
-      <pre><code><span class="dim">$</span> npm run build
-<span class="t">[T1][2026-10-29 19:42:01.100]</span> <span class="ok">START:</span> npm run build
+  <div class="wrap">
+    <h1>Know when every command ran, and how it ended.</h1>
+    <p class="lead">tstamp adds a start time, an end time, the result and the duration to every command in your terminal, across all your windows. Free, open source, and nothing ever leaves your computer.</p>
+    <p class="actions"><a id="primary-cta" class="btn" href="#install">Install tstamp</a> <a class="link" href="https://github.com/abinaze/tstamp/blob/main/docs/quick-start.md" rel="noopener">Quick start</a></p>
+    <div class="cmd hero-cmd" id="hero-cmd" hidden><pre><code id="cmd-hero">curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash</code></pre><button class="copy" type="button" data-copy="cmd-hero">Copy</button></div>
+    <p class="meta" id="hero-meta">MIT license &middot; bash on Windows, Linux and macOS</p>
+
+    <div class="compare">
+      <figure class="term">
+        <figcaption class="cap">Without tstamp</figcaption>
+        <pre><code>$ npm run build
+Build failed.</code></pre>
+        <p class="why">Did it fail? When? How long did it take?</p>
+      </figure>
+      <figure class="term strong">
+        <figcaption class="cap">With tstamp</figcaption>
+        <pre><code>$ npm run build
+[T1][19:42:01.100] START: npm run build
 Build failed.
-<span class="t">[T1][2026-10-29 19:42:04.200]</span> <span class="bad">END:</span> npm run build | EXIT=1 | DURATION=3.10s</code></pre>
-      <figcaption>Each terminal has its own session ID, so errors from different windows stay apart.</figcaption>
-    </figure>
+[T1][19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s</code></pre>
+        <p class="why">Same command, same output. Plus the answers.</p>
+      </figure>
+    </div>
   </div>
 </section>
 
-<section class="section" id="install">
+<section class="section" id="try">
+  <div class="wrap">
+    <h2>See what it prints</h2>
+    <p class="prose">Pick a command. This shows example output, not a live terminal.</p>
+    <div class="chips" role="group" aria-label="Example commands">
+      <button class="chip" type="button" data-demo="on">tstamp-a</button>
+      <button class="chip" type="button" data-demo="fail">npm run build</button>
+      <button class="chip" type="button" data-demo="export">tstamp export</button>
+    </div>
+    <div class="term demo"><pre><code id="demo-out" aria-live="polite">Choose a command above.</code></pre></div>
+    <dl class="facts">
+      <div><dt>EXIT=0</dt><dd>The command worked.</dd></div>
+      <div><dt>EXIT=1 (or any other number)</dt><dd>The command failed.</dd></div>
+      <div><dt>T1, T2</dt><dd>Which terminal window the line came from.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="section alt" id="install">
   <div class="wrap">
     <h2>Install</h2>
-    <p class="section-lead">Each system has its own package. You only need yours.</p>
-    <noscript><p class="note">JavaScript is off, so the steps for every system are shown below.</p></noscript>
+    <p class="prose">Each system has its own package. Choose yours, follow the steps, done.</p>
+    <noscript><p class="note">JavaScript is off, so the steps for every system are shown.</p></noscript>
     <p class="detected" id="detected" role="status"></p>
-
     <div class="tabs" role="tablist" aria-label="Choose your system">
       <button class="tab" role="tab" id="tab-windows" type="button" data-panel="windows" aria-controls="panel-windows" aria-selected="false">Windows</button>
-      <button class="tab" role="tab" id="tab-debian" type="button" data-panel="debian" aria-controls="panel-debian" aria-selected="false">Debian &amp; Ubuntu</button>
-      <button class="tab" role="tab" id="tab-unix" type="button" data-panel="unix" aria-controls="panel-unix" aria-selected="false">Linux, macOS &amp; WSL</button>
+      <button class="tab" role="tab" id="tab-debian" type="button" data-panel="debian" aria-controls="panel-debian" aria-selected="false">Ubuntu &amp; Debian</button>
+      <button class="tab" role="tab" id="tab-unix" type="button" data-panel="unix" aria-controls="panel-unix" aria-selected="false">Linux, Mac &amp; WSL</button>
     </div>
 
     <div class="panel" role="tabpanel" id="panel-windows" aria-labelledby="tab-windows">
-      <h3>Windows</h3>
-      <p>TStamp runs inside Git Bash. Install <a href="https://git-scm.com/download/win" rel="noopener">Git for Windows</a> first if you do not have it.</p>
-      <p><a class="btn btn-primary" href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp-windows-setup.exe">Download tstamp-windows-setup.exe</a></p>
-      <ol>
-        <li>Run the downloaded file. No administrator rights are needed.</li>
-        <li>Windows SmartScreen may warn because the installer is not code-signed. Choose <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
-        <li>Leave &ldquo;Load TStamp in every new Git Bash window&rdquo; ticked. The installer backs up <code>~/.bashrc</code> first.</li>
-        <li>Open a new Git Bash window and type <code>tstamp-a</code>.</li>
+      <ol class="steps">
+        <li><h3>Get Git for Windows</h3><p>tstamp runs in Git Bash, which comes with it. Skip this if you already have it.</p><p><a href="https://git-scm.com/download/win" rel="noopener">git-scm.com/download/win</a></p></li>
+        <li><h3>Download and open the installer</h3><p>No administrator rights needed. If Windows says &ldquo;unknown publisher&rdquo; (the installer is not code-signed), choose <strong>More info</strong>, then <strong>Run anyway</strong>. Keep &ldquo;Load tstamp in every new Git Bash window&rdquo; ticked; your <code>~/.bashrc</code> is backed up first.</p><p><a class="btn" href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp-windows-setup.exe">Download tstamp-windows-setup.exe</a></p></li>
+        <li><h3>Turn it on</h3><p>Open a new Git Bash window and run:</p><div class="cmd"><pre><code id="cmd-win">tstamp-a</code></pre><button class="copy" type="button" data-copy="cmd-win">Copy</button></div></li>
       </ol>
-      <p class="small">Uninstall from Windows Settings, then Apps. It removes exactly what it added.</p>
+      <p class="small">Uninstall: Windows Settings, then Apps, then tstamp.</p>
     </div>
 
     <div class="panel" role="tabpanel" id="panel-debian" aria-labelledby="tab-debian">
-      <h3>Debian and Ubuntu</h3>
-      <p><a class="btn btn-primary" href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp.deb">Download tstamp.deb</a></p>
-      <div class="cmd"><pre><code id="cmd-deb">sudo apt install ./tstamp.deb</code></pre><button class="copy" type="button" data-copy="cmd-deb">Copy</button></div>
-      <p>Then run <code>tstamp hook add</code> once, open a new bash window and type <code>tstamp-a</code>.</p>
+      <ol class="steps">
+        <li><h3>Download the package</h3><p><a class="btn" href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp.deb">Download tstamp.deb</a></p></li>
+        <li><h3>Install it</h3><div class="cmd"><pre><code id="cmd-deb">sudo apt install ./tstamp.deb</code></pre><button class="copy" type="button" data-copy="cmd-deb">Copy</button></div></li>
+        <li><h3>Load it in new terminals</h3><p>Asks before changing anything, and saves a backup.</p><div class="cmd"><pre><code id="cmd-deb-hook">tstamp hook add</code></pre><button class="copy" type="button" data-copy="cmd-deb-hook">Copy</button></div></li>
+        <li><h3>Turn it on</h3><p>In a new terminal:</p><div class="cmd"><pre><code id="cmd-deb-on">tstamp-a</code></pre><button class="copy" type="button" data-copy="cmd-deb-on">Copy</button></div></li>
+      </ol>
       <p class="small">Uninstall: <code>tstamp hook remove</code>, then <code>sudo apt remove tstamp</code>.</p>
     </div>
 
     <div class="panel" role="tabpanel" id="panel-unix" aria-labelledby="tab-unix">
-      <h3>Linux, macOS and WSL</h3>
-      <p>One command, no sudo. It downloads the package, checks its checksum and installs for your user.</p>
-      <div class="cmd"><pre><code id="cmd-unix">curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash</code></pre><button class="copy" type="button" data-copy="cmd-unix">Copy</button></div>
-      <p>It edits no startup file unless you add <code>-s -- --hook</code> after <code>bash</code>. Prefer to inspect first? Download <a href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp-unix.tar.gz">tstamp-unix.tar.gz</a>, unpack it and run <code>bash install.sh</code>.</p>
-      <p class="note" id="macos-note"><strong>On a Mac:</strong> Terminal opens zsh and ships bash 3.2, and TStamp supports neither. Run <code>brew install bash</code>, start it by typing <code>bash</code>, then install.</p>
-      <p class="small">Uninstall: <code>bash ~/.local/share/tstamp/uninstall.sh</code></p>
+      <ol class="steps">
+        <li><h3>Install</h3><p>No sudo. It downloads the package, checks it is not damaged, and installs for your user only.</p><div class="cmd"><pre><code id="cmd-unix">curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash</code></pre><button class="copy" type="button" data-copy="cmd-unix">Copy</button></div><p class="note" id="macos-note"><strong>On a Mac:</strong> Terminal uses zsh and an old bash, and tstamp supports neither. First run <code>brew install bash</code>, then type <code>bash</code>.</p></li>
+        <li><h3>Load it in new terminals</h3><p>Asks before changing anything, and saves a backup.</p><div class="cmd"><pre><code id="cmd-unix-hook">tstamp hook add</code></pre><button class="copy" type="button" data-copy="cmd-unix-hook">Copy</button></div></li>
+        <li><h3>Turn it on</h3><p>In a new terminal:</p><div class="cmd"><pre><code id="cmd-unix-on">tstamp-a</code></pre><button class="copy" type="button" data-copy="cmd-unix-on">Copy</button></div></li>
+      </ol>
+      <p class="small">Prefer to look first? Download <a href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp-unix.tar.gz">tstamp-unix.tar.gz</a>, unpack it and run <code>bash install.sh</code>. Uninstall: <code>bash ~/.local/share/tstamp/uninstall.sh</code></p>
     </div>
 
     <p class="note" id="release-note" role="status" hidden></p>
-
-    <details class="verify">
-      <summary>Verify your download</summary>
-      <p>Every release has a <a href="https://github.com/abinaze/tstamp/releases/latest/download/SHA256SUMS.txt">SHA256SUMS.txt</a>. Compare the checksum of your file with the matching line.</p>
-      <div class="cmd"><pre><code>Get-FileHash .\tstamp-windows-setup.exe -Algorithm SHA256   # Windows PowerShell
-sha256sum tstamp-unix.tar.gz                                # Linux, Git Bash
-shasum -a 256 tstamp-unix.tar.gz                            # macOS</code></pre></div>
-      <p class="small">A checksum from the same page catches a damaged download. It cannot protect you if the release itself were replaced.</p>
+    <details>
+      <summary>Check your download</summary>
+      <p class="prose">Each release has <a href="https://github.com/abinaze/tstamp/releases/latest/download/SHA256SUMS.txt">SHA256SUMS.txt</a>. Compare your file with its line. A match means the file is not damaged. It cannot protect you if a release itself were replaced.</p>
     </details>
-  </div>
-</section>
-
-<section class="section alt" id="features">
-  <div class="wrap">
-    <h2>What it does</h2>
-    <div class="cards">
-      <article class="card"><h3>Start and end, every time</h3><p>A START line before each command and an END line when it finishes, with the exit code and the duration. Your command&rsquo;s own output, pipelines and exit status are left alone.</p></article>
-      <article class="card"><h3>One switch for every terminal</h3><p><code>tstamp-a</code> turns tracking on in every terminal that has loaded the hook, windows that are already open included. <code>tstamp stop</code> turns it off. No restarts.</p></article>
-      <article class="card"><h3>Sessions you can tell apart</h3><p>Each terminal gets its own ID (T1, T2, &hellip;) and its own log, so an error in one window never blurs into another.</p></article>
-      <article class="card"><h3>Your own format</h3><p>Five built-in formats, or any date format string, including milliseconds with <code>%3N</code> on every system.</p></article>
-      <article class="card"><h3>One merged timeline</h3><p><code>tstamp export</code> combines the logs of the sessions you pick into a single report in time order.</p></article>
-      <article class="card"><h3>Local and safe</h3><p>No network access, no accounts, no telemetry and no background service. Installers ask before touching your startup file, back it up first and remove only what they added.</p></article>
-    </div>
   </div>
 </section>
 
 <section class="section" id="commands">
   <div class="wrap">
-    <h2>Commands</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
-        <tbody>
-          <tr><td><code>tstamp [FORMAT]</code></td><td>Track this terminal, optionally with a format.</td></tr>
-          <tr><td><code>tstamp-a [FORMAT]</code></td><td>Track every terminal with the hook. Switches itself off after a reboot.</td></tr>
-          <tr><td><code>tstamp stop</code></td><td>Stop tracking globally and in this terminal.</td></tr>
-          <tr><td><code>tstamp status</code></td><td>Show global and per-terminal status.</td></tr>
-          <tr><td><code>tstamp format</code></td><td>List the timestamp formats.</td></tr>
-          <tr><td><code>tstamp set FORMAT</code></td><td>Change the saved default format.</td></tr>
-          <tr><td><code>tstamp export [-o FILE] [T1 T2]</code></td><td>Merge session logs into one chronological report.</td></tr>
-          <tr><td><code>tstamp hook add|remove</code></td><td>Add or remove the startup-file block, with a backup.</td></tr>
-          <tr><td><code>tstamp help</code>, <code>man</code>, <code>examples</code>, <code>version</code></td><td>Offline help and the full manual.</td></tr>
-          <tr><td><code>tstamp reset</code></td><td>Restore the default configuration.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3 class="sub">Timestamp formats</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">ID</th><th scope="col">Meaning</th><th scope="col">Example</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Hours and minutes</td><td><code>19:42</code></td></tr>
-          <tr><td>2</td><td>Hours, minutes and seconds</td><td><code>19:42:01</code></td></tr>
-          <tr><td>3</td><td>Date and time</td><td><code>2026-10-29 19:42:01</code></td></tr>
-          <tr><td>4 (default)</td><td>Date, time and milliseconds</td><td><code>2026-10-29 19:42:01.100</code></td></tr>
-          <tr><td>5</td><td>Date, time and UTC offset</td><td><code>2026-10-29 19:42:01 +0530</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Any date format string works too: <code>tstamp set "%d/%m/%Y %H:%M"</code>.</p>
+    <h2>The few commands you need</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">Type</th><th scope="col">To</th></tr></thead>
+      <tbody>
+        <tr><td><code>tstamp-a</code></td><td>Turn on in every terminal window</td></tr>
+        <tr><td><code>tstamp</code></td><td>Turn on in this window only</td></tr>
+        <tr><td><code>tstamp stop</code></td><td>Turn off</td></tr>
+        <tr><td><code>tstamp status</code></td><td>See what is on</td></tr>
+        <tr><td><code>tstamp set 2</code></td><td>Choose a time style (1 to 5, or your own pattern)</td></tr>
+        <tr><td><code>tstamp export</code></td><td>Merge all windows into one timeline</td></tr>
+        <tr><td><code>tstamp man</code></td><td>Read the full manual offline</td></tr>
+      </tbody>
+    </table></div>
+    <p class="prose">Tracking switches itself off when the computer restarts. Type <code>tstamp-a</code> again. <a href="https://github.com/abinaze/tstamp/blob/main/docs/commands.md" rel="noopener">All commands</a> &middot; <a href="https://github.com/abinaze/tstamp/blob/main/docs/timestamp-formats.md" rel="noopener">Time styles</a></p>
   </div>
 </section>
 
-<section class="section alt" id="compatibility">
+<section class="section alt" id="compat">
   <div class="wrap">
-    <h2>Compatibility</h2>
-    <p class="section-lead">What is claimed here is what automated tests have shown, nothing more.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">System</th><th scope="col">Status</th><th scope="col">Details</th></tr></thead>
-        <tbody>
-          <tr><td>Windows, Git Bash</td><td>Tested in CI</td><td>Full test suite, plus a silent install and uninstall of the installer on a clean machine.</td></tr>
-          <tr><td>Ubuntu, bash</td><td>Tested in CI</td><td>Full test suite, plus installing and removing the .deb.</td></tr>
-          <tr><td>macOS, bash 5 (Homebrew)</td><td>Tested in CI</td><td>Full test suite. <code>install.sh</code> also runs under the built-in bash 3.2, but TStamp itself needs bash 4.4 or newer.</td></tr>
-          <tr><td>Reboot reset</td><td>Partly tested</td><td>Boot markers are checked on all three systems. A real restart has not been tested yet.</td></tr>
-          <tr><td>WSL, other Linux distributions</td><td>Not tested yet</td><td>Likely to work. Not claimed.</td></tr>
-          <tr><td>Windows Terminal and IDE terminals running Git Bash</td><td>Not tested yet</td><td></td></tr>
-          <tr><td>zsh (macOS default), fish</td><td>Not supported yet</td><td>On a Mac, start bash first.</td></tr>
-          <tr><td>PowerShell, CMD</td><td>Not supported yet</td><td></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="privacy">
-  <div class="wrap">
-    <h2>Privacy and security</h2>
-    <ul class="list">
-      <li>TStamp makes no network connections, sends no telemetry and needs no account.</li>
-      <li>Logs live in <code>~/.tstamp/logs</code>, unencrypted and readable by your user account. They contain the full text of every tracked command, including any secret typed on a command line. Run <code>tstamp stop</code> before typing secrets and delete old logs.</li>
-      <li>This website loads no third-party scripts, fonts or trackers. Its only network request is an optional lookup of the latest release at api.github.com.</li>
-      <li>Found a vulnerability? Please report it privately, as described in <a href="https://github.com/abinaze/tstamp/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.</li>
-    </ul>
-  </div>
-</section>
-
-<section class="section alt" id="docs">
-  <div class="wrap">
-    <h2>Documentation</h2>
-    <ul class="list">
-      <li><a href="https://github.com/abinaze/tstamp/blob/main/docs/manual.txt" rel="noopener">Manual</a>: commands, formats, configuration, troubleshooting. Also offline with <code>tstamp man</code>.</li>
-      <li><a href="https://github.com/abinaze/tstamp/blob/main/docs/ARCHITECTURE.md" rel="noopener">Architecture</a>: how tracking, state and the installers work.</li>
-      <li><a href="https://github.com/abinaze/tstamp/blob/main/CHANGELOG.md" rel="noopener">Changelog</a></li>
-      <li><a href="https://github.com/abinaze/tstamp/blob/main/CONTRIBUTING.md" rel="noopener">Contributing</a> and the <a href="https://github.com/abinaze/tstamp/blob/main/CODE_OF_CONDUCT.md" rel="noopener">Code of Conduct</a></li>
-      <li><a href="https://github.com/abinaze/tstamp/issues" rel="noopener">Issues</a>: bug reports and feature requests.</li>
-    </ul>
+    <h2>Where it works</h2>
+    <p class="prose">Only what automated tests have shown.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">System</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr><td>Windows, Git Bash</td><td>Tested in CI, including the installer</td></tr>
+        <tr><td>Ubuntu, bash</td><td>Tested in CI, including the .deb</td></tr>
+        <tr><td>macOS, bash 5 (Homebrew)</td><td>Tested in CI. The built-in bash 3.2 is too old.</td></tr>
+        <tr><td>Restart behaviour</td><td>Partly tested. A real restart has not been tested yet.</td></tr>
+        <tr><td>WSL, Windows Terminal, IDE terminals</td><td>Not tested yet</td></tr>
+        <tr><td>zsh (macOS default), fish</td><td>Not supported yet</td></tr>
+        <tr><td>PowerShell, CMD</td><td>Not supported yet</td></tr>
+      </tbody>
+    </table></div>
   </div>
 </section>
 
 <section class="section" id="faq">
   <div class="wrap">
     <h2>Questions</h2>
-    <details><summary>Does it work in zsh, fish, PowerShell or CMD?</summary><p>Not yet. TStamp supports bash today. macOS Terminal opens zsh by default, so on a Mac start bash first.</p></details>
-    <details><summary>Why does the Windows version need Git Bash?</summary><p>TStamp is a bash tool, and Git for Windows provides bash. The installer checks for it and tells you if it is missing.</p></details>
-    <details><summary>Windows warns about the installer. Is it safe?</summary><p>The installer is not code-signed, because certificates cost money, so SmartScreen warns about any unsigned download. The source is open, and you can compare your download with SHA256SUMS.txt.</p></details>
-    <details><summary>Will it still be on after a reboot?</summary><p>Global tracking switches itself off after a reboot. Run <code>tstamp-a</code> again. A real restart has not been tested yet; the check has only been verified with simulated boot markers.</p></details>
-    <details><summary>Where are my logs?</summary><p>In <code>~/.tstamp/logs</code>, one file per terminal. <code>tstamp export</code> merges them into one report.</p></details>
-    <details><summary>How do I uninstall it?</summary><p>On Windows, use Settings, then Apps. On Debian and Ubuntu, run <code>sudo apt remove tstamp</code>. Elsewhere, run <code>bash ~/.local/share/tstamp/uninstall.sh</code>. Each one removes what it added and asks before deleting your logs.</p></details>
+    <details><summary>Does it send my commands anywhere?</summary><p>No. tstamp makes no network connections and has no telemetry. It saves a log in <code>~/.tstamp/logs</code>. That log has the full text of every tracked command, including any password typed inside one, so run <code>tstamp stop</code> first and delete old logs.</p></details>
+    <details><summary>Will it change my commands or their output?</summary><p>No. Your command, its output and its result are left alone. tstamp only adds the START and END lines.</p></details>
+    <details><summary>Why does Windows need Git Bash?</summary><p>tstamp is a bash tool, and Git for Windows provides bash. The installer checks and tells you if it is missing.</p></details>
+    <details><summary>Is it safe to run the Windows installer?</summary><p>It is not code-signed, because certificates cost money, so Windows warns about any unsigned download. The source is open, and you can compare your download with SHA256SUMS.txt.</p></details>
+    <details><summary>How do I report a security problem?</summary><p>Privately. See <a href="https://github.com/abinaze/tstamp/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.</p></details>
   </div>
 </section>
 
 </main>
 
-<footer class="site-footer">
+<footer class="footer">
   <div class="wrap foot">
-    <p>TStamp is open source under the <a href="https://github.com/abinaze/tstamp/blob/main/LICENSE" rel="noopener">MIT license</a>. &copy; 2026 abinaze</p>
-    <p><a href="https://github.com/abinaze/tstamp" rel="noopener">GitHub</a> &middot; <a href="https://github.com/abinaze/tstamp/releases" rel="noopener">Releases</a> &middot; <a href="https://github.com/abinaze/tstamp/issues" rel="noopener">Issues</a></p>
+    <p>MIT license &middot; <a href="https://github.com/abinaze/tstamp" rel="noopener">GitHub</a> &middot; <a href="https://github.com/abinaze/tstamp/releases" rel="noopener">Releases</a> &middot; <a href="https://github.com/abinaze/tstamp/issues" rel="noopener">Issues</a> &middot; <a href="https://github.com/abinaze/tstamp/blob/main/CHANGELOG.md" rel="noopener">Changelog</a></p>
   </div>
 </footer>
-
 </body>
 </html>
