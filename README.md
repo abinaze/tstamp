@@ -1,24 +1,27 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/svg/tstamp-horizontal-light.svg">
-    <img alt="tstamp" src="assets/brand/png/tstamp-horizontal-dark.png" width="300">
-  </picture>
+  <img src="assets/brand/png/tstamp-banner.png" alt="tstamp: timestamp every command in your terminal" width="640">
 </p>
 
-<p align="center"><strong>See exactly when every command in your terminal started, ended and how long it took.</strong></p>
+<p align="center">
+  <a href="https://github.com/abinaze/tstamp/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/abinaze/tstamp/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-14181D"></a>
+  <img alt="Platforms: Windows, Linux, macOS" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-14181D">
+  <img alt="Shell: bash" src="https://img.shields.io/badge/shell-bash-14181D">
+</p>
 
-<p align="center">Free and open source &middot; Runs only on your computer &middot; No account, no tracking</p>
+<p align="center">
+  <a href="#install">Install</a> &middot;
+  <a href="docs/quick-start.md">Quick start</a> &middot;
+  <a href="docs/commands.md">Commands</a> &middot;
+  <a href="docs/README.md">Documentation</a> &middot;
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
 
 ---
 
-## What is tstamp?
-
-The terminal is the text window where you type commands. It does not tell you
-*when* you typed something, *how long* it took, or *whether it worked*.
-
-**tstamp** adds that information for you. Around every command it prints one
-line when the command starts and one when it ends, with the time, the result
-and the duration:
+**tstamp** shows you when every command in your terminal started, when it
+ended, whether it worked, and how long it took. It is free, open source, and
+runs only on your computer.
 
 ```text
 [T1][2026-10-29 19:42:01.100] START: npm run build
@@ -26,87 +29,108 @@ Build failed.
 [T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s
 ```
 
-`EXIT=0` means the command worked. Any other number means it failed.
+`EXIT=0` means the command worked. Any other number means it failed. Your
+command and its output are not changed.
 
-## Why use it?
+## Why tstamp
 
-- **Find out what went wrong, and when.** Every error has a time stamp.
-- **Many terminals, no confusion.** Each window gets its own label (`T1`, `T2`, ...).
-- **Keep a record.** One command combines all your windows into a single timeline.
-- **Private by design.** It never connects to the internet. Everything stays on your computer.
-- **Stays out of the way.** Your commands, their output and their results are not changed.
+| | |
+|---|---|
+| **Answers "when?" and "how long?"** | Every command gets a start time, an end time and a duration. |
+| **Tells windows apart** | Each terminal window has its own label (`T1`, `T2`, ...). |
+| **One switch for everything** | `tstamp-a` turns it on in every window, including windows already open. |
+| **One timeline** | `tstamp export` merges all windows into a single list in time order. |
+| **Your time style** | Five built-in styles, or write your own. |
+| **Private** | No internet, no account, no tracking, no background program. |
 
 ## Install
 
-Choose the one for your computer. You only need one.
+Choose your computer. You only need one.
 
-| Your computer | What to download | How |
+| Your computer | Package | How |
 |---|---|---|
 | **Windows** | `tstamp-windows-setup.exe` | Download from the [Releases page](https://github.com/abinaze/tstamp/releases/latest) and open it |
-| **Ubuntu or Debian** | `tstamp.deb` | `sudo apt install ./tstamp.deb`, then `tstamp hook add` |
-| **Other Linux, Mac or WSL** | `tstamp-unix.tar.gz` | Paste the command below into your terminal |
+| **Ubuntu, Debian** | `tstamp.deb` | `sudo apt install ./tstamp.deb`, then `tstamp hook add` |
+| **Other Linux, Mac, WSL** | `tstamp-unix.tar.gz` | Paste the command below |
 
 ```bash
 curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash
 ```
 
-> **Not released yet.** The download links above start working when the first
-> version is published. Until then you can try tstamp from this repository:
-> `source shells/bash.sh`
+> **Not released yet.** The download links start working when the first version
+> is published. To try tstamp from this repository now, run
+> `source shells/bash.sh` in a bash terminal.
 
-**Good to know**
+Windows needs [Git for Windows](https://git-scm.com/download/win) (the installer
+checks). On a Mac, use bash 5: `brew install bash`, then type `bash`. Step-by-step
+help, including uninstalling, is in [Installation](docs/installation.md).
 
-- On Windows, tstamp runs inside **Git Bash**, which comes with [Git for Windows](https://git-scm.com/download/win). The installer tells you if it is missing.
-- Windows may warn you about the installer ("unknown publisher"), because it is not code-signed. Choose **More info**, then **Run anyway**.
-- tstamp works with **bash** only. On a Mac, install a newer bash with `brew install bash` and start it by typing `bash`.
+## Quick start
 
-## Your first minute
+```bash
+tstamp-a          # turn it on in every terminal
+echo hello        # run anything: you now see START and END lines
+tstamp status     # see what is on
+tstamp stop       # turn it off
+```
 
-1. Open a **new** terminal (Git Bash on Windows).
-2. Type `tstamp-a` and press Enter. This switches tstamp on in every window.
-3. Run any command, for example `echo hello`. You will see the START and END lines.
-4. Type `tstamp stop` to switch it off.
+Open a **new** terminal first. Tracking switches itself off when the computer
+restarts: type `tstamp-a` again. The full walk-through is in the
+[Quick start](docs/quick-start.md).
 
-Tracking switches itself off when the computer restarts. Type `tstamp-a` again to turn it back on.
+## Commands
 
-## The commands you need
-
-| Type this | What happens |
+| Command | What it does |
 |---|---|
 | `tstamp-a` | Turn on in all terminals |
 | `tstamp` | Turn on in this terminal only |
 | `tstamp stop` | Turn off |
 | `tstamp status` | Show what is on |
-| `tstamp format` | Show the time styles you can choose |
-| `tstamp set 2` | Choose a time style (1 to 5, or your own) |
-| `tstamp export` | Combine all windows into one timeline |
-| `tstamp help` | Short help; `tstamp man` shows the full manual |
+| `tstamp format` / `tstamp set 2` | See and choose the time style |
+| `tstamp export` | Merge all windows into one timeline |
+| `tstamp help` / `tstamp man` | Short help / full offline manual |
 
-## Privacy
+Every command is explained in [Commands](docs/commands.md).
 
-tstamp saves a log of the commands you run in `~/.tstamp/logs`. **If you type a
-password directly into a command, it is saved in that log.** Type `tstamp stop`
-before doing that, and delete old logs you no longer need. The logs are never
-sent anywhere.
+## Documentation
 
-## Works on
+| Page | Contents |
+|---|---|
+| [Introduction](docs/introduction.md) | What tstamp does, in plain words |
+| [Installation](docs/installation.md) | Install and uninstall on each system |
+| [Quick start](docs/quick-start.md) | Your first five minutes |
+| [Commands](docs/commands.md) | Every command |
+| [Timestamp formats](docs/timestamp-formats.md) | Time styles and your own patterns |
+| [Examples](docs/examples.md) | Real situations and what to type |
+| [Compatibility](docs/compatibility.md) | What is tested, and what is not |
+| [Troubleshooting](docs/troubleshooting.md) | Problems and fixes |
+| [Contributing](docs/contributing.md) | Report a problem or help build tstamp |
+| [Changelog](docs/changelog.md) | Version history |
 
-Tested automatically on Windows (Git Bash), Ubuntu and macOS (with bash 5). zsh,
-fish, PowerShell and CMD are not supported yet. Details are in the
-[manual](docs/manual.txt).
+## Compatibility
 
-## Learn more
+| Where | Status |
+|---|---|
+| Windows (Git Bash) | Tested in CI, including the installer |
+| Ubuntu (bash) | Tested in CI, including the `.deb` |
+| macOS (bash 5) | Tested in CI |
+| zsh, fish, PowerShell, CMD | Not supported yet |
+| WSL, Windows Terminal, IDE terminals | Not tested yet |
 
-- [Manual](docs/manual.txt): every command, also available offline with `tstamp man`
-- [How it works](docs/ARCHITECTURE.md): for the curious
-- [Changelog](CHANGELOG.md): what changed in each version
-- [Releasing](docs/RELEASING.md): how new versions are published
+Details and requirements: [Compatibility](docs/compatibility.md).
+
+## Privacy and safety
+
+tstamp never connects to the internet. It saves a log of your commands in
+`~/.tstamp/logs`. **A password typed inside a command is saved in that log.**
+Type `tstamp stop` before doing that, and delete old logs. Security problems
+should be reported privately: see [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
-Bug reports and improvements are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
-first, and see the [Code of Conduct](CODE_OF_CONDUCT.md). Security problems go
-through [SECURITY.md](SECURITY.md). To run the tests: `bash tests/run_all.sh`.
+Bug reports, ideas, documentation fixes and testing on other systems are all
+welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md). To run the tests: `bash tests/run_all.sh`.
 
 ## License
 
