@@ -3,9 +3,11 @@
 
   var REPO = 'abinaze/tstamp';
   var DOWNLOADS = 'https://github.com/' + REPO + '/releases/latest/download/';
-
   var PANEL_FOR = { windows: 'windows', linux: 'unix', macos: 'unix' };
   var NAME = { windows: 'Windows', linux: 'Linux', macos: 'macOS' };
+  var root = document.documentElement;
+
+  function byId(id) { return document.getElementById(id); }
 
   function detectOS() {
     var nav = window.navigator;
@@ -18,6 +20,45 @@
     return 'unknown';
   }
 
+  /* ---------- theme toggle ---------- */
+
+  var themeBtn = byId('theme-toggle');
+
+  function currentTheme() {
+    var t = root.getAttribute('data-theme');
+    if (t === 'light' || t === 'dark') { return t; }
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+
+  function showTheme() {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    themeBtn.textContent = next === 'dark' ? 'Dark' : 'Light';
+    themeBtn.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+  }
+
+  themeBtn.addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { window.localStorage.setItem('tstamp-theme', next); } catch (e) { /* not saved */ }
+    showTheme();
+  });
+  showTheme();
+
+  /* ---------- mobile menu ---------- */
+
+  var menuBtn = byId('menu-toggle');
+  var siteNav = byId('site-nav');
+  menuBtn.addEventListener('click', function () {
+    var open = siteNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  Array.prototype.forEach.call(siteNav.querySelectorAll('a'), function (a) {
+    a.addEventListener('click', function () {
+      siteNav.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
   /* ---------- install tabs ---------- */
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
@@ -25,7 +66,7 @@
   function activate(id, focus) {
     tabs.forEach(function (tab, i) {
       var on = tab.getAttribute('data-panel') === id;
-      var panel = document.getElementById(tab.getAttribute('aria-controls'));
+      var panel = byId(tab.getAttribute('aria-controls'));
       tab.setAttribute('aria-selected', on ? 'true' : 'false');
       tab.setAttribute('tabindex', (on || (!id && i === 0)) ? '0' : '-1');
       if (panel) { panel.hidden = !on; }
@@ -34,9 +75,7 @@
   }
 
   tabs.forEach(function (tab, i) {
-    tab.addEventListener('click', function () {
-      activate(tab.getAttribute('data-panel'), false);
-    });
+    tab.addEventListener('click', function () { activate(tab.getAttribute('data-panel'), false); });
     tab.addEventListener('keydown', function (e) {
       var j = -1;
       if (e.key === 'ArrowRight') { j = (i + 1) % tabs.length; }
@@ -50,26 +89,28 @@
     });
   });
 
+  /* ---------- detect the system: hero action and first tab ---------- */
+
   var os = detectOS();
-  var detected = document.getElementById('detected');
-  var cta = document.getElementById('primary-cta');
-  var macNote = document.getElementById('macos-note');
+  var detected = byId('detected');
+  var cta = byId('primary-cta');
+  var heroCmd = byId('hero-cmd');
 
   if (PANEL_FOR[os]) {
     activate(PANEL_FOR[os], false);
-    detected.textContent = 'Showing the package for ' + NAME[os] + '. On another system? Choose it below.';
+    detected.textContent = 'Showing the steps for ' + NAME[os] + '. On another system? Choose it below.';
     if (os === 'windows') {
       cta.textContent = 'Download for Windows';
       cta.setAttribute('href', DOWNLOADS + 'tstamp-windows-setup.exe');
     } else {
-      cta.textContent = 'Install for ' + NAME[os];
-      cta.setAttribute('href', '#install');
+      cta.textContent = 'Install steps for ' + NAME[os];
+      heroCmd.hidden = false;
     }
-    if (os === 'macos' && macNote) { macNote.classList.add('emph'); }
+    if (os === 'macos') { byId('macos-note').classList.add('emph'); }
   } else {
     activate(null, false);
     detected.textContent = (os === 'mobile')
-      ? 'Open this page on the computer where you use your terminal, then choose your system.'
+      ? 'Open this page on the computer where you use your terminal.'
       : 'Choose your system.';
   }
 
@@ -101,7 +142,7 @@
 
   Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (btn) {
     btn.addEventListener('click', function () {
-      var src = document.getElementById(btn.getAttribute('data-copy'));
+      var src = byId(btn.getAttribute('data-copy'));
       if (!src) { return; }
       copyText(src.textContent.trim()).then(function (ok) {
         btn.textContent = ok ? 'Copied' : 'Copy failed';
@@ -110,10 +151,27 @@
     });
   });
 
+  /* ---------- example output ---------- */
+
+  var DEMO = {
+    on: '$ tstamp-a\nGlobal tracking enabled.\nTerminals with the TStamp hook loaded start tracking at their next prompt.\nTracking turns off after a reboot.',
+    fail: '$ npm run build\n[T1][2026-10-29 19:42:01.100] START: npm run build\nBuild failed.\n[T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s',
+    'export': '$ tstamp export\n[T1][2026-10-29 19:42:01.100] START: npm run build\n[T2][2026-10-29 19:42:02.500] START: npm test\n[T2][2026-10-29 19:42:02.900] END: npm test | EXIT=0 | DURATION=0.40s\n[T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s'
+  };
+  var out = byId('demo-out');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('[data-demo]'));
+
+  function showDemo(key) {
+    out.textContent = DEMO[key];
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', c.getAttribute('data-demo') === key ? 'true' : 'false'); });
+  }
+  chips.forEach(function (c) { c.addEventListener('click', function () { showDemo(c.getAttribute('data-demo')); }); });
+  showDemo('fail');
+
   /* ---------- latest release lookup (the only network request) ---------- */
 
-  var note = document.getElementById('release-note');
-  var meta = document.getElementById('hero-meta');
+  var note = byId('release-note');
+  var meta = byId('hero-meta');
   var controller = (typeof AbortController === 'function') ? new AbortController() : null;
   var timer = controller ? window.setTimeout(function () { controller.abort(); }, 6000) : null;
 
