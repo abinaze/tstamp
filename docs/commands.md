@@ -1,0 +1,94 @@
+# Commands
+
+Type these in a terminal where tstamp is installed.
+
+| Command | What it does |
+|---|---|
+| `tstamp-a [FORMAT]` | Turn on in **every** terminal that has tstamp loaded |
+| `tstamp [FORMAT]` | Turn on in **this** terminal only |
+| `tstamp stop` | Turn off everywhere and in this terminal |
+| `tstamp status` | Show what is on |
+| `tstamp format` | List the time styles, with live examples |
+| `tstamp set FORMAT` | Save a new default time style |
+| `tstamp export [-o FILE] [T1 T2 ...]` | Combine logs into one timeline |
+| `tstamp hook add [FILE]` | Load tstamp in every new bash window |
+| `tstamp hook remove [FILE]` | Undo `hook add` |
+| `tstamp help` | Short help |
+| `tstamp man` | The full manual, offline |
+| `tstamp examples` | Ready-to-use examples |
+| `tstamp version` | Show the installed version |
+| `tstamp reset` | Restore the default settings |
+
+`FORMAT` is a number from 1 to 5, or your own pattern. See
+[timestamp formats](timestamp-formats.md).
+
+## tstamp-a
+
+Turns tracking on for all terminals. Terminals that are already open start at
+their next prompt; new ones start with their first command. With a format,
+`tstamp-a 2` also saves it as the default. Global tracking ends when the computer
+restarts.
+
+## tstamp
+
+Turns tracking on in the current window only. A format, such as `tstamp 2`,
+applies to this window only.
+
+## tstamp stop
+
+Turns off global tracking and tracking in this window. Other windows stop at
+their next prompt. A window where you typed `tstamp` yourself keeps going until
+you type `tstamp stop` in it.
+
+## tstamp status
+
+Shows this window's state and label, the saved time style, whether global
+tracking is on, and which windows are open. Example:
+
+```text
+This terminal : on (global)
+Session ID    : T1
+Format here   : %H:%M:%S
+Global        : on (since 2026-10-30 07:37:50)
+Default format: 2
+Live sessions : T1(pid 1173) T2(pid 1199)
+```
+
+## tstamp export
+
+Combines the logs of your windows into one list, oldest first, in your saved
+time style.
+
+```bash
+tstamp export                     # all windows, on screen
+tstamp export T1 T3               # only windows T1 and T3
+tstamp export -o report.txt       # save to a file
+```
+
+It never overwrites an existing file. If it finds no logs it says so and exits
+with status 1.
+
+## tstamp hook add and remove
+
+`hook add` adds a short block to your bash startup file (`~/.bashrc` by default)
+so new windows load tstamp. It asks first, saves a backup, and never touches
+other lines. `hook remove` takes the block out again. Add `--yes` to skip the
+question. The installers run these for you.
+
+## Where tstamp keeps things
+
+| Place | Contents |
+|---|---|
+| `~/.tstamp/config` | Your saved time style |
+| `~/.tstamp/logs/` | One log file per window |
+| `~/.tstamp/enabled` | Exists only while global tracking is on |
+
+## Privacy
+
+The logs contain the full text of every command, including any password you
+type inside a command. They are not encrypted and never leave your computer. Run
+`tstamp stop` before typing secrets, and delete logs you no longer need:
+
+```bash
+rm -rf ~/.tstamp/logs
+```
