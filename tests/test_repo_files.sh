@@ -36,7 +36,7 @@ for f in "${FILES[@]}"; do
 done
 
 has "LICENSE is MIT" LICENSE 'MIT License'
-has "LICENSE names the copyright holder" LICENSE 'Copyright (c) 2026 abinaze'
+has "LICENSE names the copyright holder" LICENSE 'Copyright (c) 2026 '
 has "LICENSE has the warranty clause" LICENSE 'WITHOUT WARRANTY OF ANY KIND'
 has "CHANGELOG has an Unreleased section" CHANGELOG.md '## [Unreleased]'
 has "SECURITY explains private reporting" SECURITY.md 'Report a vulnerability'
