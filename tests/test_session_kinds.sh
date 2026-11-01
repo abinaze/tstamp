@@ -31,7 +31,7 @@ source "$ROOT/shells/bash.sh"
 tstamp
 exit
 INPUT
-check "bash skips the other family's session and does not reclaim it" 1 "$(grep -c 'session T3' "$TMP/out" || true)"
+check "bash skips the other family's session and reuses the dead bash session" 1 "$(grep -c 'session T2' "$TMP/out" || true)"
 check "the other family's session folder is untouched" yes "$([ -f "$TSTAMP_HOME/sessions/T1/kind" ] && echo yes || echo no)"
 
 echo
