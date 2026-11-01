@@ -81,6 +81,7 @@ __tstamp_ensure_session() {
       __tstamp_log="$TSTAMP_HOME/logs/$__tstamp_sid-$$.log"
       return 0
     fi
+    [ -f "$d/kind" ] && { n=$((n + 1)); continue; }
     pid=""
     [ -f "$d/pid" ] && read -r pid < "$d/pid"
     if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then
