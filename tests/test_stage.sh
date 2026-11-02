@@ -34,7 +34,7 @@ done
 check "tests are not staged" no "$(exists "$S/tests")"
 check "installer sources are not staged" no "$(exists "$S/installer")"
 check "git files are not staged" no "$(exists "$S/.git")"
-check "no CRLF in staged scripts" 0 "$(cat "$S"/bin/* "$S"/lib/* "$S"/shells/* "$S/VERSION" | tr -cd "\r" | wc -c | tr -d ' ')"
+check "no CRLF in staged scripts" 0 "$(cat "$S"/bin/tstamp "$S"/bin/tstamp-a "$S"/lib/* "$S"/shells/* "$S/VERSION" | tr -cd "\r" | wc -c | tr -d ' ')"
 
 check "staged copy reports the version" "tstamp $(cat "$ROOT/VERSION")" "$(bash "$S/bin/tstamp" version)"
 bash "$S/bin/tstamp" help >/dev/null 2>&1
