@@ -4,3 +4,4 @@ bin/tstamp text eol=lf
 VERSION text eol=lf
 bin/* text eol=lf
 docs/*.txt text eol=lf
+*.cmd text eol=crlf
