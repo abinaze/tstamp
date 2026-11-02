@@ -38,6 +38,18 @@ rep="$(bash "$T" export 2>&1)"
 check "export shows all three runs (6 events)" 6 "$(printf '%s\n' "$rep" | grep -c 'START:\|END:')"
 has "export shows the first run" 'START: echo hello world$' "$rep"
 
+# started from CMD, commands go through cmd.exe, not bash's own lookup
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) ;;
+  *)
+    mkdir -p "$TMP/fakebin"
+    printf '#!/bin/sh\necho "CMDSTUB $*"\n' > "$TMP/fakebin/cmd.exe"
+    chmod +x "$TMP/fakebin/cmd.exe"
+    out="$(TSTAMP_RUN_SHELL=cmd PATH="$TMP/fakebin:$PATH" bash "$T" run echo hi 2>&1)"
+    has "from CMD, the command is run through cmd.exe" '^CMDSTUB /c echo hi$' "$out"
+    ;;
+esac
+
 echo
 echo "passed=$pass failed=$fail"
 [ "$fail" -eq 0 ]

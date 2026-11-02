@@ -34,6 +34,9 @@ has "run from CMD keeps the native exit code" 'END: cmd /c exit 3 \| EXIT=3 ' "$
 cmd //c "$BAT run cmd /c exit 3" >/dev/null 2>&1
 check "the exit code reaches CMD" 3 "$?"
 
+out="$(cmd //c "$BAT run ver" 2>&1 | tr -d '\r')"
+has "from CMD, run uses CMD's own ver command" 'Microsoft Windows' "$out"
+
 out="$(cmd //c "$BATA 2" 2>&1 | tr -d '\r')"
 has "tstamp-a works from CMD" 'Global tracking enabled\.' "$out"
 check "tstamp-a saved the format" "format=2" "$(grep '^format=' "$TSTAMP_HOME/config" | tr -d '\r')"
