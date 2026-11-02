@@ -81,6 +81,12 @@ COMMANDS
       (default ~/.bashrc), so new terminals load the hook. A backup is
       made first and nothing changes without your confirmation.
 
+  tstamp run COMMAND [ARGS...]
+      Run one command with START and END lines, its exit code and its
+      duration, written to the same log as your other windows. It works
+      from any shell, including CMD, which cannot be tracked
+      automatically. It returns the exit code of the command.
+
 FORMATS
   ID  Meaning                       Format string
   --  ----------------------------  ---------------------------

@@ -13,6 +13,7 @@ USAGE
   tstamp examples        Show examples
   tstamp version         Show the installed version
   tstamp reset           Restore the default configuration
+  tstamp run COMMAND     Time one command (also works in CMD)
   tstamp hook add|remove Add or remove the Git Bash startup hook
 
 FORMAT is a number 1-5 or a custom date format string such as "%H:%M".
