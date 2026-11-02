@@ -18,6 +18,8 @@ source "$TSTAMP_ROOT/lib/state.sh"
 source "$TSTAMP_ROOT/lib/export.sh"
 # shellcheck source=/dev/null
 source "$TSTAMP_ROOT/lib/profile.sh"
+# shellcheck source=/dev/null
+source "$TSTAMP_ROOT/lib/run.sh"
 
 # Usage: show_doc FILE [pager]
 # Prints docs/FILE. With "pager", uses less when stdout is a terminal.
@@ -84,6 +86,11 @@ case "$cmd" in
   status)
     echo "Standalone status (a hooked terminal also shows its own state):"
     tstamp_print_global_status
+    ;;
+  run)
+    shift
+    tstamp_run "$@"
+    exit $?
     ;;
   export)
     shift
