@@ -12,6 +12,7 @@ if not exist "%BASH_EXE%" goto nobash
 set "TSTAMP_SCRIPT=%~dp0tstamp"
 set "TSTAMP_SCRIPT=%TSTAMP_SCRIPT:\=/%"
 set "MSYS2_ARG_CONV_EXCL=*"
+set "TSTAMP_RUN_SHELL=cmd"
 "%BASH_EXE%" "%TSTAMP_SCRIPT%" %*
 exit /b %ERRORLEVEL%
 :nobash
