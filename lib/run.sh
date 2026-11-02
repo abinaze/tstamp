@@ -42,7 +42,11 @@ tstamp_run() {
   printf '[%s][%s] START: %s\n' "$sid" "$TSTAMP_OUT" "$text"
   printf '%s\t%s\t%s\tSTART\t\t\t%s\n' "$us0" "$sid" "$$" "$text" >> "$log"
 
-  if command -v "$1" >/dev/null 2>&1; then
+  if [ "${TSTAMP_RUN_SHELL:-}" = cmd ] && command -v cmd.exe >/dev/null 2>&1; then
+    # Started from CMD: use CMD's own command lookup (dir, ver, .bat files).
+    MSYS2_ARG_CONV_EXCL='*' cmd.exe /c "$@"
+    rc=$?
+  elif command -v "$1" >/dev/null 2>&1; then
     "$@"
     rc=$?
   elif command -v cmd.exe >/dev/null 2>&1; then
