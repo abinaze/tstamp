@@ -149,6 +149,10 @@ __tstamp_start() { # $1 = fallback command text
 # Runs from the DEBUG trap, before each command.
 __tstamp_debug() {
   local rc=$? last="${1:-}" cmd="${2:-}"
+  if [ "$cmd" = __tstamp_precmd ]; then
+    __tstamp_armed=0
+    return "$rc"
+  fi
   if [ "$__tstamp_armed" = 1 ] && [ -z "${COMP_POINT:-}" ]; then
     __tstamp_armed=0
     if __tstamp_enabled; then
