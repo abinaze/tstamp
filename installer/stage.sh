@@ -14,7 +14,7 @@ esac
 rm -rf "$STAGE"
 
 mkdir -p "$STAGE/bin" "$STAGE/lib" "$STAGE/shells" "$STAGE/docs"
-cp "$ROOT/bin/tstamp" "$ROOT/bin/tstamp-a" "$STAGE/bin/"
+cp "$ROOT/bin/tstamp" "$ROOT/bin/tstamp-a" "$ROOT"/bin/*.cmd "$STAGE/bin/"
 cp "$ROOT"/lib/*.sh "$STAGE/lib/"
 cp "$ROOT/shells/bash.sh" "$STAGE/shells/"
 cp "$ROOT"/docs/*.txt "$STAGE/docs/"
@@ -26,7 +26,7 @@ fi
 # Scripts with Windows line endings break on the shebang line.
 # (tr is used because grep cannot take a bare CR as a pattern in Git Bash.)
 bad=""
-for f in "$STAGE"/bin/* "$STAGE"/lib/* "$STAGE"/shells/* "$STAGE/VERSION"; do
+for f in "$STAGE/bin/tstamp" "$STAGE/bin/tstamp-a" "$STAGE"/lib/* "$STAGE"/shells/* "$STAGE/VERSION"; do
   if [ -n "$(tr -cd '\r' < "$f" | head -c 1)" ]; then
     bad="$bad$f"$'\n'
   fi
