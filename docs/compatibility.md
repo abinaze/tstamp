@@ -12,8 +12,10 @@ that.
 | Restart behaviour | Partly tested. The check works with simulated restarts. A real restart has not been tested yet. |
 | WSL, other Linux | Not tested yet. |
 | Windows Terminal, VS Code or other terminals running bash | Not tested yet. |
+| Windows PowerShell 5.1 | Tested. START and END lines, exit codes, shared logs and the profile hook are tested in CI and were tried by hand on Windows 11. |
+| PowerShell 7 | Not tested yet. |
+| Command Prompt (CMD) | **Cannot be tracked automatically**, because CMD has no way to run code around each command. The `tstamp` commands and `tstamp run COMMAND` work there and are tested. |
 | zsh (the Mac default), fish | Not supported yet. |
-| PowerShell, CMD | Not supported yet. |
 
 ## What "tested" means
 

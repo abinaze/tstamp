@@ -16,9 +16,19 @@ https://git-scm.com/download/win. The tstamp installer tells you if it is missin
 2. Open the file. You do not need administrator rights.
 3. Windows may say "unknown publisher", because the installer is not
    code-signed. Choose **More info**, then **Run anyway**.
-4. Leave **Load tstamp in every new Git Bash window** ticked. The installer
-   makes a backup of your `~/.bashrc` file first.
-5. Open a new Git Bash window.
+4. Keep the three boxes ticked: **Git Bash**, **PowerShell**, and **CMD and
+   PowerShell commands**. The installer saves a backup of your `~/.bashrc` and
+   of your PowerShell profile first. The last box adds tstamp to your user PATH
+   only.
+5. Open a new Git Bash or PowerShell window and type `tstamp-a`. In Command
+   Prompt, time one command at a time with `tstamp run COMMAND`. CMD cannot be
+   tracked automatically.
+
+If PowerShell says that running scripts is disabled, run this once in PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
 
 **Uninstall:** Windows Settings, then Apps, find tstamp, then Uninstall. It asks
 whether to also delete your saved logs. The default answer is No.
