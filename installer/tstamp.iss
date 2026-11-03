@@ -105,7 +105,7 @@ begin
   Result := Pos(';' + Lowercase(dir) + ';', ';' + Lowercase(path) + ';') > 0;
 end;
 
-{ Adds {app}\bin to the user PATH (no administrator rights needed). }
+// Adds the install folder to the user PATH (no administrator rights needed).
 procedure AddToUserPath;
 var
   p, d: string;
