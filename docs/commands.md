@@ -18,6 +18,7 @@ Type these in a terminal where tstamp is installed.
 | `tstamp examples` | Ready-to-use examples |
 | `tstamp version` | Show the installed version |
 | `tstamp reset` | Restore the default settings |
+| `tstamp run COMMAND [ARGS...]` | Time one command, in any shell including CMD |
 
 `FORMAT` is a number from 1 to 5, or your own pattern. See
 [timestamp formats](timestamp-formats.md).
@@ -74,6 +75,20 @@ with status 1.
 so new windows load tstamp. It asks first, saves a backup, and never touches
 other lines. `hook remove` takes the block out again. Add `--yes` to skip the
 question. The installers run these for you.
+
+## tstamp run
+
+Runs one command and prints a START and an END line around it, with the exit code
+and the duration. It writes to the same log as your other windows, so
+`tstamp export` includes it. It returns the command's own exit code.
+
+```bash
+tstamp run npm run build
+```
+
+It works in every shell, and it is the way to time commands in Command Prompt,
+which cannot be tracked automatically. In Command Prompt it uses CMD's own
+commands, so `tstamp run dir` and `tstamp run ver` work.
 
 ## Where tstamp keeps things
 
