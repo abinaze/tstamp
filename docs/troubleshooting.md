@@ -59,6 +59,28 @@ zone: `tstamp set 5`.
 Follow [installation](installation.md) to uninstall, then delete the folder
 `~/.tstamp`. Backups of your startup file stay next to it and can be deleted.
 
+## PowerShell says running scripts is disabled
+
+Windows blocks script files by default. Allow your own scripts, for your user
+only, by running this once in PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Then open a new PowerShell window.
+
+## Nothing is timed in Command Prompt
+
+That is expected. CMD has no way to run code around each command, so it cannot
+be tracked automatically. Use `tstamp run COMMAND` to time one command.
+
+## "tstamp" is not recognized in Command Prompt
+
+Open a **new** Command Prompt window after installing, and keep the box
+**CMD and PowerShell commands** ticked in the installer. Until then you can run
+`tstamp.cmd` from the `bin` folder of the install.
+
 ## Still stuck?
 
 Open an issue and include the output of `tstamp version` and `tstamp status`:
