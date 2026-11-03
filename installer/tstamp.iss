@@ -18,6 +18,7 @@ DisableDirPage=yes
 DisableProgramGroupPage=yes
 DisableReadyPage=yes
 PrivilegesRequired=lowest
+ChangesEnvironment=yes
 OutputDir=..\dist
 OutputBaseFilename=tstamp-windows-setup
 Compression=lzma2
@@ -26,11 +27,13 @@ WizardStyle=modern
 UninstallDisplayName=TStamp
 
 [Messages]
-FinishedLabel=Setup has installed [name] on your computer.%n%nOpen a new Git Bash window, then type tstamp-a to timestamp every terminal, or tstamp for just one.
-FinishedLabelNoIcons=Setup has installed [name] on your computer.%n%nOpen a new Git Bash window, then type tstamp-a to timestamp every terminal, or tstamp for just one.
+FinishedLabel=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, time one command at a time with: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+FinishedLabelNoIcons=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, time one command at a time with: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 [Tasks]
-Name: "bashhook"; Description: "Load TStamp in every new Git Bash window (edits ~/.bashrc after making a backup)"; GroupDescription: "Git Bash integration:"
+Name: "bashhook"; Description: "Load TStamp in every new Git Bash window (edits ~/.bashrc after making a backup)"; GroupDescription: "Terminals:"
+Name: "powershellhook"; Description: "Load TStamp in every new PowerShell window (edits your PowerShell profile after making a backup)"; GroupDescription: "Terminals:"
+Name: "addtopath"; Description: "Use the tstamp, tstamp-a and tstamp run commands in CMD and PowerShell (adds the install folder to your user PATH)"; GroupDescription: "Terminals:"
 
 [Files]
 Source: "..\dist\stage\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
@@ -81,6 +84,62 @@ begin
   Result := Exec(bash, params, '', SW_HIDE, ewWaitUntilTerminated, code) and (code = 0);
 end;
 
+{ Runs "tstamp hook add|remove --powershell --yes" through Git Bash. }
+function RunTstampPS(const action: string): Boolean;
+var
+  bash, app, params: string;
+  code: Integer;
+begin
+  Result := False;
+  bash := GitBashPath;
+  if bash = '' then
+    Exit;
+  app := ExpandConstant('{app}');
+  StringChangeEx(app, '\', '/', True);
+  params := '-l -c "''' + app + '/bin/tstamp'' hook ' + action + ' --powershell --yes"';
+  Result := Exec(bash, params, '', SW_HIDE, ewWaitUntilTerminated, code) and (code = 0);
+end;
+
+function PathContains(const path, dir: string): Boolean;
+begin
+  Result := Pos(';' + Lowercase(dir) + ';', ';' + Lowercase(path) + ';') > 0;
+end;
+
+{ Adds {app}\bin to the user PATH (no administrator rights needed). }
+procedure AddToUserPath;
+var
+  p, d: string;
+begin
+  d := ExpandConstant('{app}\bin');
+  if not RegQueryStringValue(HKCU, 'Environment', 'Path', p) then
+    p := '';
+  if PathContains(p, d) then
+    Exit;
+  if (p <> '') and (Copy(p, Length(p), 1) <> ';') then
+    p := p + ';';
+  RegWriteExpandStringValue(HKCU, 'Environment', 'Path', p + d);
+end;
+
+{ Removes only the entry that AddToUserPath wrote. }
+procedure RemoveFromUserPath;
+var
+  p, d, q: string;
+begin
+  d := ExpandConstant('{app}\bin');
+  if not RegQueryStringValue(HKCU, 'Environment', 'Path', p) then
+    Exit;
+  q := ';' + p + ';';
+  StringChangeEx(q, ';' + d + ';', ';', True);
+  while Copy(q, 1, 1) = ';' do
+    Delete(q, 1, 1);
+  while Copy(q, Length(q), 1) = ';' do
+    Delete(q, Length(q), 1);
+  if q = '' then
+    RegDeleteValue(HKCU, 'Environment', 'Path')
+  else
+    RegWriteExpandStringValue(HKCU, 'Environment', 'Path', q);
+end;
+
 function InitializeSetup: Boolean;
 begin
   Result := True;
@@ -103,6 +162,14 @@ begin
         MsgBox('TStamp was installed, but adding it to ~/.bashrc failed.' + #13#10 + #13#10 +
           'Open Git Bash and run:  tstamp hook add', mbInformation, MB_OK);
     end;
+    if WizardIsTaskSelected('powershellhook') then
+    begin
+      if not RunTstampPS('add') then
+        MsgBox('TStamp was installed, but adding it to your PowerShell profile failed.' + #13#10 + #13#10 +
+          'Open Git Bash and run:  tstamp hook add --powershell', mbInformation, MB_OK);
+    end;
+    if WizardIsTaskSelected('addtopath') then
+      AddToUserPath;
   end;
 end;
 
@@ -116,6 +183,8 @@ begin
       MsgBox('TStamp could not remove its block from ~/.bashrc automatically.' + #13#10 + #13#10 +
         'Open ~/.bashrc and delete the lines between "# >>> tstamp >>>" and "# <<< tstamp <<<".',
         mbInformation, MB_OK);
+    RunTstampPS('remove');
+    RemoveFromUserPath;
   end;
   if CurUninstallStep = usPostUninstall then
   begin
