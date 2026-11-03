@@ -158,7 +158,15 @@ SHELL COMPATIBILITY
   an IDE terminal
   WSL and other Linux distributions    Not tested yet.
   Zsh, Fish                            Not implemented.
-  PowerShell, CMD                      Not implemented.
+  Windows PowerShell 5.1               Tested in CI and by hand: START and
+                                       END lines, exit codes, shared logs
+                                       and the profile hook ("tstamp hook
+                                       add --powershell").
+  PowerShell 7                         Not tested yet.
+  CMD                                  Cannot be tracked automatically (CMD
+                                       has no hook). The tstamp commands
+                                       and "tstamp run COMMAND" work there
+                                       and are tested.
 
 EXAMPLES
   Run "tstamp examples" for a list of ready-to-use commands.
