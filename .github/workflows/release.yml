@@ -142,6 +142,11 @@ jobs:
           printf 'type tstamp\nexit\n' | bash --rcfile "$HOME/.bashrc" -i > load.out 2>&1 || true
           cat load.out
           grep -q 'tstamp is a function' load.out
+          pathuser="$(powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable('Path','User')" | tr -d '\r')"
+          printf '%s\n' "$pathuser" | tr ';' '\n' | grep -qF 'Programs\TStamp\bin'
+          psprofile="$(cygpath -u "$(powershell -NoProfile -Command '$PROFILE' | tr -d '\r')")"
+          grep -qF '# >>> tstamp >>>' "$psprofile"
+          cmd //c "$(cygpath -w "$app/bin/tstamp.cmd") version"
 
       - name: Smoke test, silent uninstall
         shell: pwsh
@@ -158,6 +163,12 @@ jobs:
         run: |
           n="$(grep -cF '# >>> tstamp >>>' "$HOME/.bashrc" || true)"
           echo "hook blocks left in ~/.bashrc: $n"
+          [ "$n" = 0 ]
+          pathuser="$(powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable('Path','User')" | tr -d '\r')"
+          if printf '%s\n' "$pathuser" | tr ';' '\n' | grep -qF 'Programs\TStamp\bin'; then echo "PATH entry still present"; exit 1; fi
+          psprofile="$(cygpath -u "$(powershell -NoProfile -Command '$PROFILE' | tr -d '\r')")"
+          n="$(grep -cF '# >>> tstamp >>>' "$psprofile" || true)"
+          echo "PowerShell profile blocks left: $n"
           [ "$n" = 0 ]
 
       - name: Attach the installer to the draft release
