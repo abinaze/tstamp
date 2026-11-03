@@ -47,6 +47,7 @@ has   "iss: calls hook add" "$ISS" "RunTstamp('add')"
 has   "iss: calls hook remove on uninstall" "$ISS" "RunTstamp('remove')"
 has   "iss: passes --yes to the hook command" "$ISS" ' --yes"'
 has   "iss: stops cleanly when Git Bash is missing" "$ISS" 'Install Git for Windows'
+check "iss: no { } comment contains another brace" 0 "$(grep -cE '^\{[^}]*\{' "$ISS" || true)"
 has   "iss: PowerShell profile is a task" "$ISS" 'Name: "powershellhook"'
 has   "iss: PATH is a task" "$ISS" 'Name: "addtopath"'
 has   "iss: PowerShell hook uses the tested command" "$ISS" '--powershell --yes"'
