@@ -129,3 +129,20 @@ uninstall. On a tag it creates a draft release and attaches every file plus
 
 File names carry no version, so the `releases/latest/download/<file>` links
 used by the README and the website keep working.
+
+## PowerShell, CMD and `run`
+
+`shells/powershell.ps1` tracks commands in Windows PowerShell 5.1. It uses
+PSReadLine's `AddToHistoryHandler` to print the START line when a line is
+submitted, and a wrapper around `prompt` to print the END line, taking the
+exit code from `$?`, `$LASTEXITCODE` and the error list. It writes the same
+state folder, global flag and tab-separated logs as the bash integration, so
+`tstamp export` merges both. Sessions it owns carry a `kind` file, and bash
+never reclaims or lists them, because their process IDs mean something else to
+bash. The other commands run through Git Bash.
+
+CMD has no hook that runs around each command, so it cannot be tracked
+automatically. `bin/tstamp.cmd` and `bin/tstamp-a.cmd` run the normal commands
+through Git Bash, and `tstamp run COMMAND` (`lib/run.sh`) times one command, from
+any shell. Started from CMD, it runs the command through `cmd.exe` so built-ins
+like `dir` work.
