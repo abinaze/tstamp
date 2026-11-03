@@ -114,7 +114,9 @@ Every command is explained in [Commands](docs/commands.md).
 | Windows (Git Bash) | Tested in CI, including the installer |
 | Ubuntu (bash) | Tested in CI, including the `.deb` |
 | macOS (bash 5) | Tested in CI |
-| zsh, fish, PowerShell, CMD | Not supported yet |
+| Windows PowerShell 5.1 | Tested in CI and by hand |
+| CMD | Cannot be tracked automatically; `tstamp run COMMAND` times one command |
+| zsh, fish | Not supported yet |
 | WSL, Windows Terminal, IDE terminals | Not tested yet |
 
 Details and requirements: [Compatibility](docs/compatibility.md).
