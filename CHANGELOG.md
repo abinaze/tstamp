@@ -26,6 +26,12 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - Automated test suite, run in CI on Ubuntu, macOS (current Homebrew
   bash) and Windows (Git Bash).
 - MIT license and contributor documentation.
+- PowerShell support (Windows PowerShell 5.1): START and END lines, state shared
+  with Git Bash, and `tstamp hook add --powershell`.
+- `tstamp run COMMAND` times one command from any shell, and `tstamp.cmd` and
+  `tstamp-a.cmd` launchers let Command Prompt use the tstamp commands.
+- The Windows installer can add the PowerShell profile block and a user PATH
+  entry, and removes both on uninstall.
 - Separate packages per system: Windows installer, Debian package, and a
   Unix tarball with install and uninstall scripts for Linux, macOS and WSL.
 - Web installer (`get.sh`) that verifies a checksum before installing.
@@ -40,7 +46,7 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Known limitations
 
-- Only bash is supported. Zsh, Fish, PowerShell and CMD are not
+- Supported: bash and Windows PowerShell 5.1. CMD cannot be tracked automatically. Zsh and Fish are not
   supported yet.
 - macOS needs a current bash (for example from Homebrew); the built-in
   bash 3.2 is too old.
