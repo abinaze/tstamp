@@ -47,6 +47,13 @@ has   "iss: calls hook add" "$ISS" "RunTstamp('add')"
 has   "iss: calls hook remove on uninstall" "$ISS" "RunTstamp('remove')"
 has   "iss: passes --yes to the hook command" "$ISS" ' --yes"'
 has   "iss: stops cleanly when Git Bash is missing" "$ISS" 'Install Git for Windows'
+has   "iss: PowerShell profile is a task" "$ISS" 'Name: "powershellhook"'
+has   "iss: PATH is a task" "$ISS" 'Name: "addtopath"'
+has   "iss: PowerShell hook uses the tested command" "$ISS" '--powershell --yes"'
+has   "iss: the environment change is broadcast" "$ISS" 'ChangesEnvironment=yes'
+has   "iss: uninstall removes the PATH entry" "$ISS" 'RemoveFromUserPath;'
+has   "iss: uninstall removes the PowerShell block" "$ISS" "RunTstampPS('remove')"
+has   "release: checks the PATH entry after install" "$REL" 'GetEnvironmentVariable'
 has   "iss: deleting user data defaults to No" "$ISS" 'MB_DEFBUTTON2'
 has   "stage.sh writes where the installer script reads" "$STAGE" 'dist/stage'
 
