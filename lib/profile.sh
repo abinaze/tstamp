@@ -157,8 +157,15 @@ tstamp_cmd_hook() {
       return 1
     fi
   else
-    [ -n "$file" ] || file="$HOME/.bashrc"
-    targets=("bash|$file")
+    if [ -n "$file" ]; then
+      targets=("bash|$file")
+    elif [ "$(uname -s)" = Darwin ]; then
+      # Terminal on a Mac starts login shells (.bash_profile); typing "bash"
+      # starts a plain one (.bashrc). The hook loads only once either way.
+      targets=("bash|$HOME/.bash_profile" "bash|$HOME/.bashrc")
+    else
+      targets=("bash|$HOME/.bashrc")
+    fi
   fi
   for t in "${targets[@]}"; do list="$list ${t#*|}"; done
 
