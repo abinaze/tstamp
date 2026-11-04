@@ -48,6 +48,10 @@ A new integration (for example Zsh or Fish) must:
 5. Add a row to the compatibility table in `docs/manual.txt`, marked
    according to what the tests prove.
 
+If your shell reports process IDs that bash cannot check (as PowerShell does), write
+a `kind` file next to `pid` in its session folder, so bash never reclaims the
+label. See `shells/powershell.ps1`.
+
 ## Pull requests
 
 Fill in the pull request template and make sure `bash tests/run_all.sh`

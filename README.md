@@ -74,7 +74,7 @@ tstamp status     # see what is on
 tstamp stop       # turn it off
 ```
 
-Open a **new** terminal first. Tracking switches itself off when the computer
+Open a **new** terminal first (Git Bash or PowerShell on Windows). Tracking switches itself off when the computer
 restarts: type `tstamp-a` again. The full walk-through is in the
 [Quick start](docs/quick-start.md).
 

@@ -35,4 +35,4 @@ within a week.
 - The Windows installer is not code-signed. Compare your download with
   `SHA256SUMS.txt` from the same release page.
 - The hook adds one block, marked `# >>> tstamp >>>` and
-  `# <<< tstamp <<<`, to `~/.bashrc` after making a backup.
+  `# <<< tstamp <<<`, to `~/.bashrc` (and your PowerShell profile, if you choose) after making a backup.
