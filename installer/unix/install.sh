@@ -144,10 +144,10 @@ case "$HOOK" in
 esac
 
 if [ "$do_hook" = yes ]; then
-  "$PREFIX/bin/tstamp" hook add --yes "$RC"
+  "$PREFIX/bin/tstamp" hook add --yes
 else
   echo "Hook not added. To load TStamp in new bash windows later, run:"
-  echo "  tstamp hook add $RC"
+  echo "  tstamp hook add"
 fi
 
 echo "TStamp $(cat "$PREFIX/VERSION") installed in $PREFIX"
