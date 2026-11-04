@@ -76,10 +76,12 @@ COMMANDS
       Restore the default configuration (default format 4). It does not
       change the global setting and does not delete logs.
 
-  tstamp hook add|remove [--yes] [FILE]
+  tstamp hook add|remove [--yes] [--powershell] [FILE]
       Add or remove the TStamp block in your Git Bash startup file
       (default ~/.bashrc), so new terminals load the hook. A backup is
       made first and nothing changes without your confirmation.
+      With --powershell it edits your PowerShell profile instead. On a Mac
+      it edits both ~/.bash_profile and ~/.bashrc.
 
   tstamp run COMMAND [ARGS...]
       Run one command with START and END lines, its exit code and its
@@ -275,4 +277,5 @@ UNINSTALLATION
 LIMITATIONS
   Not yet tested: full-screen programs (vim, less, ssh), several
   commands on one line, background jobs and very long-running commands.
-  Only bash is supported.
+  Supported: bash and Windows PowerShell 5.1. CMD cannot be tracked
+  automatically.

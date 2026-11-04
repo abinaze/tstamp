@@ -112,7 +112,7 @@ based only on what these tests, locally or in CI, have shown.
 
 ## Known limits
 
-- Only bash 4.4 or newer is supported so far.
+- Supported: bash 4.4 or newer and Windows PowerShell 5.1. CMD cannot be tracked automatically.
 - A pipeline is recorded as one command.
 - Full-screen programs, background jobs and several commands on one line
   are not tested yet.
