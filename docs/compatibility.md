@@ -26,6 +26,7 @@ Ubuntu and macOS.
 ## Requirements
 
 - **bash 4.4 or newer.** Check with `bash --version`. Git Bash qualifies.
-- Windows needs Git for Windows.
+- Windows needs Git for Windows, also for PowerShell and CMD, because most tstamp
+  commands run through Git Bash.
 - Only terminals that load tstamp can be tracked. Windows opened before tstamp was
   installed do not have it.

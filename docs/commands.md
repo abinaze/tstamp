@@ -11,8 +11,8 @@ Type these in a terminal where tstamp is installed.
 | `tstamp format` | List the time styles, with live examples |
 | `tstamp set FORMAT` | Save a new default time style |
 | `tstamp export [-o FILE] [T1 T2 ...]` | Combine logs into one timeline |
-| `tstamp hook add [FILE]` | Load tstamp in every new bash window |
-| `tstamp hook remove [FILE]` | Undo `hook add` |
+| `tstamp hook add [--powershell]` | Load tstamp in every new bash (or PowerShell) window |
+| `tstamp hook remove [--powershell]` | Undo `hook add` |
 | `tstamp help` | Short help |
 | `tstamp man` | The full manual, offline |
 | `tstamp examples` | Ready-to-use examples |
@@ -71,10 +71,11 @@ with status 1.
 
 ## tstamp hook add and remove
 
-`hook add` adds a short block to your bash startup file (`~/.bashrc` by default)
-so new windows load tstamp. It asks first, saves a backup, and never touches
-other lines. `hook remove` takes the block out again. Add `--yes` to skip the
-question. The installers run these for you.
+`hook add` adds a short block to your bash startup file (`~/.bashrc`; on a Mac
+both `~/.bash_profile` and `~/.bashrc`) so new windows load tstamp. With
+`--powershell` it edits your PowerShell profile instead. It asks first, saves a
+backup, and never touches other lines. `hook remove` takes the block out again.
+Add `--yes` to skip the question. The installers run these for you.
 
 ## tstamp run
 

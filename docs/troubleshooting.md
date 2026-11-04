@@ -59,6 +59,15 @@ zone: `tstamp set 5`.
 Follow [installation](installation.md) to uninstall, then delete the folder
 `~/.tstamp`. Backups of your startup file stay next to it and can be deleted.
 
+## A new Git Bash window does not have tstamp
+
+Git Bash reads `~/.bash_profile` first. Make sure that file loads
+`~/.bashrc`, where tstamp's block lives, for example with this line:
+
+```bash
+[ -f ~/.bashrc ] && . ~/.bashrc
+```
+
 ## PowerShell says running scripts is disabled
 
 Windows blocks script files by default. Allow your own scripts, for your user

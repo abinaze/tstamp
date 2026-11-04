@@ -4,7 +4,8 @@
 
 A terminal is a window where you control your computer by typing commands.
 Programmers, students and system administrators use it every day. On Windows
-this guide uses **Git Bash**, a terminal that comes with Git for Windows.
+this guide uses **Git Bash** (a terminal that comes with Git for Windows) and
+**PowerShell**.
 
 ## What does tstamp do?
 

@@ -39,6 +39,10 @@ tstamp set "%H:%M:%S.%3N"        # 19:42:01.100
 A pattern must contain at least one `%`. tstamp checks it and tells you if it
 is not valid. `%6N` gives millionths of a second.
 
+The pieces in the table work in Git Bash, PowerShell and every other shell. Other
+date codes (such as `%p` for AM or PM) work in bash but are not supported in
+PowerShell yet, and show up there as typed.
+
 ## Order of choice
 
 A window's own format (`tstamp 2`) wins over the saved default (`tstamp set`),
