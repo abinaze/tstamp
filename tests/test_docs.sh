@@ -28,7 +28,7 @@ contains() { # description, text, needle
 
 COMMANDS=("tstamp-a" "tstamp stop" "tstamp status" "tstamp format" "tstamp set" \
   "tstamp export" "tstamp help" "tstamp man" "tstamp examples" "tstamp version" "tstamp reset")
-HEADINGS=("NAME" "SYNOPSIS" "DESCRIPTION" "COMMANDS" "FORMATS" "CONFIGURATION" \
+HEADINGS=("NAME" "SYNOPSIS" "DESCRIPTION" "COMMANDS" "FORMATS" \
   "OUTPUT AND LOGS" "SHELL COMPATIBILITY" "EXAMPLES" "TROUBLESHOOTING" "PRIVACY" \
   "INSTALLATION" "UNINSTALLATION" "LIMITATIONS")
 
