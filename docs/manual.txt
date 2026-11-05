@@ -1,285 +1,324 @@
 NAME
-  tstamp - see when every command in your terminal started, ended, and
-  how long it took
+       tstamp - see when every command in your terminal started, ended and
+       how long it took
 
 SYNOPSIS
-  tstamp [FORMAT]
-  tstamp-a [FORMAT]
-  tstamp set FORMAT
-  tstamp stop | status | format | export | reset
-  tstamp run COMMAND [ARGS...]
-  tstamp hook add|remove [--yes] [--powershell] [FILE]
-  tstamp help | man | examples | version
+       tstamp [FORMAT]
+       tstamp-a [FORMAT]
+       tstamp stop
+       tstamp status
+       tstamp format
+       tstamp set FORMAT
+       tstamp export [-o FILE] [SESSION...]
+       tstamp run COMMAND [ARGS...]
+       tstamp hook add|remove [--yes] [--powershell] [FILE]
+       tstamp help | man | examples | version | reset
 
 DESCRIPTION
-  A terminal is the window where you type commands. It does not tell you
-  when you ran a command, how long it took, or whether it worked.
-  tstamp adds that. Around every command it prints two lines:
+       A terminal is the window where you type commands. It does not show
+       when you ran a command, how long it took, or whether it worked.
+       tstamp adds that. Around every command it prints two lines:
 
-  [T1][2026-10-29 19:42:01.100] START: npm run build
-  Build failed.
-  [T1][2026-10-29 19:42:04.200] END: npm run build | EXIT=1 | DURATION=3.10s
+        [T1][2026-10-29 19:42:01.100] START: npm test
+        Tests failed.
+        [T1][2026-10-29 19:42:04.200] END: npm test | EXIT=1 | DURATION=3.10s
 
-  T1         The label of this terminal window (the next one is T2).
-  START/END  The command began / the command finished.
-  EXIT=1     The result. 0 means it worked. Any other number means it
-             failed.
-  DURATION   How long it took, in seconds.
+       T1           The label of this terminal window. The next is T2.
+       START, END   The command began, or the command finished.
+       EXIT=1       The result. 0 means it worked. Any other number means
+                    it failed.
+       DURATION     How long it took, in seconds.
 
-  Your command, its output and its result are not changed. tstamp makes
-  no network connection, sends nothing anywhere and runs no background
-  program. Everything stays on your computer.
+       Your command, its output and its result are not changed.
+
+       tstamp makes no network connection, sends nothing anywhere and runs
+       no background program. Everything stays on your computer.
+
+GETTING STARTED
+       1. Install tstamp (see INSTALLATION) and open a new terminal.
+       2. Type: tstamp-a
+       3. Run any command, for example: echo hello
+          You now see a START and an END line.
+       4. Type: tstamp stop
+
+       Tracking switches itself off when the computer restarts. Type
+       tstamp-a again to turn it back on.
 
 COMMANDS
-  tstamp [FORMAT]
-      Turn tracking on in this window only. FORMAT is a number from 1 to
-      5, or your own pattern (see FORMATS), and applies to this window
-      only. Needs tstamp to be loaded in this window (see INSTALLATION).
+   Turn tracking on and off
+       tstamp-a [FORMAT]
+              Turn tracking on in every window that has tstamp loaded,
+              including windows that are already open. They start at their
+              next prompt. With FORMAT, that style is also saved as the
+              default.
 
-  tstamp-a [FORMAT]
-      Turn tracking on in every window that has tstamp loaded, including
-      windows that are already open. They start at their next prompt.
-      With FORMAT, that style is also saved as the default. Tracking
-      switches itself off when the computer restarts: type tstamp-a again.
+       tstamp [FORMAT]
+              Turn tracking on in this window only. FORMAT applies to this
+              window only. Needs tstamp to be loaded in this window.
 
-  tstamp stop
-      Turn tracking off everywhere and in this window. Other windows stop
-      at their next prompt. A window where you typed "tstamp" yourself
-      keeps tracking until you type "tstamp stop" in that window.
+       tstamp stop
+              Turn tracking off everywhere and in this window. Other
+              windows stop at their next prompt. A window where you typed
+              "tstamp" yourself keeps tracking until you type
+              "tstamp stop" in that window.
 
-  tstamp status
-      Show whether tracking is on in this window, this window's label,
-      the time style, and whether the global switch is on.
+       tstamp status
+              Show whether tracking is on in this window, this window's
+              label, the time style, and whether the global switch is on.
 
-  tstamp format
-      List the time styles with the current time as an example. The
-      saved default is marked with *.
+   Records
+       tstamp export [-o FILE] [SESSION...]
+              Combine the logs of your windows into one list, oldest first,
+              in your saved time style. Give window labels (T1 T2) to
+              include only those. The list goes to the screen, or to FILE
+              with -o. An existing file is never overwritten.
 
-  tstamp set FORMAT
-      Save a new default time style (a number 1 to 5, or your own pattern).
+       tstamp run COMMAND [ARGS...]
+              Run one command with START and END lines, its exit code and
+              its duration, written to the same log as your other windows.
+              It works in every shell, including Command Prompt (CMD),
+              which cannot be tracked automatically. It returns the exit
+              code of the command.
 
-  tstamp export [-o FILE] [SESSION...]
-      Combine the logs of your windows into one list, oldest first, in
-      your saved time style. Give window labels (T1 T2) to include only
-      those. The list goes to the screen, or to FILE with -o. An existing
-      file is never overwritten. It exits with status 1 if there are no
-      matching logs.
+   Time style
+       tstamp format
+              List the time styles with the current time as an example.
+              The saved default is marked with *.
 
-  tstamp run COMMAND [ARGS...]
-      Run one command with START and END lines, its exit code and its
-      duration, written to the same log as your other windows. It works
-      in every shell, including Command Prompt (CMD), which cannot be
-      tracked automatically. It returns the exit code of the command.
+       tstamp set FORMAT
+              Save a new default time style: a number from 1 to 5, or your
+              own pattern.
 
-  tstamp hook add|remove [--yes] [--powershell] [FILE]
-      Add or remove a short block in your bash startup file (~/.bashrc;
-      on a Mac both ~/.bash_profile and ~/.bashrc) so new windows load
-      tstamp. With --powershell it edits your PowerShell profile instead.
-      It asks first, saves a backup, and changes nothing outside its own
-      block. --yes skips the question. The installers do this for you.
+       tstamp reset
+              Restore the default settings (style 4). It does not delete
+              logs and does not change the global switch.
 
-  tstamp help
-      Show a short list of commands.
+   Startup files
+       tstamp hook add [--yes] [--powershell] [FILE]
+       tstamp hook remove [--yes] [--powershell] [FILE]
+              Add or remove a short block in your bash startup file
+              (~/.bashrc; on a Mac both ~/.bash_profile and ~/.bashrc), so
+              new windows load tstamp. With --powershell it edits your
+              PowerShell profile instead. It asks first, saves a backup,
+              and changes nothing outside its own block. --yes skips the
+              question. The installers do this for you.
 
-  tstamp man
-      Show this manual (through "less" when it is available).
-
-  tstamp examples
-      Show examples you can copy.
-
-  tstamp version
-      Show the installed version.
-
-  tstamp reset
-      Restore the default settings (time style 4). It does not delete logs
-      and does not change the global switch.
+   Help and information
+       tstamp help       A short list of commands.
+       tstamp man        This manual (through "less" when available).
+       tstamp examples   Examples you can copy.
+       tstamp version    The installed version.
 
 FORMATS
-  A format is the style of the time in the START and END lines.
+       A format is the style of the time in the START and END lines.
 
-  Number  Meaning                       Example
-  ------  ----------------------------  -------------------------
-  1       Hours and minutes             19:42
-  2       Hours, minutes, seconds       19:42:01
-  3       Date and time                 2026-10-29 19:42:01
-  4       Date, time, milliseconds      2026-10-29 19:42:01.100
-  5       Date, time and time zone      2026-10-29 19:42:01 +0530
+       Number   Meaning                      Example
+       ------   --------------------------   -------------------------
+       1        Hours and minutes            19:42
+       2        Hours, minutes, seconds      19:42:01
+       3        Date and time                2026-10-29 19:42:01
+       4        Date, time, milliseconds     2026-10-29 19:42:01.100
+       5        Date, time and time zone     2026-10-29 19:42:01 +0530
 
-  Style 4 is the default. To make your own, write a pattern with at least
-  one % in quotes, for example:
+       Style 4 is the default. To make your own, write a pattern with at
+       least one % in quotes:
 
-    tstamp set "%d/%m/%Y %H:%M"
+          tstamp set "%d/%m/%Y %H:%M"
 
-  %Y year   %m month   %d day   %H hour (00-23)   %M minute   %S second
-  %b month name   %a weekday   %j day of the year   %z time zone
-  %3N thousandths of a second   %6N millionths of a second
+       %Y year          %m month           %d day
+       %H hour (00-23)  %M minute          %S second
+       %b month name    %a weekday         %j day of the year
+       %z time zone     %3N thousandths    %6N millionths of a second
 
-  These pieces work in bash and in PowerShell. Other date codes, such as
-  %p for AM or PM, work in bash but are not supported in PowerShell yet.
+       These work in bash and in PowerShell. Other date codes, such as %p
+       for AM or PM, work in bash but are not supported in PowerShell yet.
 
-CONFIGURATION
-  tstamp keeps its files in the folder .tstamp in your home folder.
+EXIT STATUS
+       0      The command worked.
+       1      It could not do what you asked, for example "tstamp export"
+              found no matching logs, or you answered no when asked.
+       2      It was used wrongly: an unknown command, an invalid format,
+              or a startup file change without confirmation.
 
-  config            Your saved time style (one line: format=4).
-  enabled           Exists only while the global switch is on. It records
-                    which start-up of the computer created it and is
-                    ignored after the next restart.
-  sessions/         One small folder for each open window.
-  logs/             One log file for each window.
+       "tstamp run" returns the exit code of the command it ran.
 
-  A window's own style (tstamp 2) wins over the saved style (tstamp set),
-  which wins over style 4. To keep the files somewhere else, set the
-  environment variable TSTAMP_HOME before starting the terminal.
+ENVIRONMENT
+       TSTAMP_HOME   The folder where tstamp keeps its files. Set it before
+                     starting the terminal. Default: .tstamp in your home
+                     folder.
+       TSTAMP_BASH   Command Prompt only: the full path of Git Bash's
+                     bash.exe, when it is not in the usual place.
 
-  The windows of Git Bash and PowerShell use the same folder, so one
-  global switch covers both, and "tstamp export" combines their logs.
+FILES AND CONFIGURATION
+       ~/.tstamp/config    Your saved time style (one line: format=4).
+       ~/.tstamp/enabled   Exists only while the global switch is on. It
+                           remembers which start-up of the computer made
+                           it, and is ignored after the next restart.
+       ~/.tstamp/sessions/ One small folder for each open window.
+       ~/.tstamp/logs/     One log file for each window.
+
+       A window's own style (tstamp 2) wins over the saved style
+       (tstamp set), which wins over style 4.
+
+       Git Bash and PowerShell windows use the same folder, so one global
+       switch covers both, and "tstamp export" combines their logs.
 
 OUTPUT AND LOGS
-  The lines on screen look like this, with the time in your style:
+       On screen:
 
-  [LABEL][TIME] START: command
-  [LABEL][TIME] END: command | EXIT=number | DURATION=seconds
+          [LABEL][TIME] START: command
+          [LABEL][TIME] END: command | EXIT=number | DURATION=seconds
 
-  Each log file has one line per event, with these fields separated by
-  tab characters: the time in microseconds since 1970, the window label,
-  the shell's process number, START or END, the exit code and duration in
-  microseconds (END only), and the command text. Tabs and line breaks in
-  the command become spaces.
+       Each log file has one line per event, with these fields separated
+       by tab characters: the time in microseconds since 1970, the window
+       label, the shell's process number, START or END, the exit code and
+       the duration in microseconds (END only), and the command text.
+       Tabs and line breaks in the command become spaces.
 
-  The tstamp commands themselves are not tracked. A pipeline is recorded
-  as one command. Commands run while tracking is off are not recorded.
-
-SHELL COMPATIBILITY
-  This lists what automated tests or hand tests have shown. Nothing is
-  claimed beyond it.
-
-  Where                              Status
-  ---------------------------------  ------------------------------------
-  Git Bash on Windows                Tested in CI and by hand, including
-                                     the installer.
-  Windows PowerShell 5.1             Tested in CI and by hand: START and
-                                     END lines, exit codes, shared logs
-                                     and the profile hook.
-  PowerShell 7                       Not tested yet.
-  Command Prompt (CMD)               Cannot be tracked automatically,
-                                     because CMD has no hook. The tstamp
-                                     commands and "tstamp run" work there
-                                     and are tested.
-  Ubuntu, bash                       Tested in CI, including the .deb.
-  macOS, bash 5 (Homebrew)           Tested in CI. The built-in bash 3.2
-                                     is too old.
-  Restart behaviour                  Partly tested. A real restart has not
-                                     been tested yet.
-  WSL, other Linux                   Not tested yet.
-  Windows Terminal, IDE terminals    Not tested yet.
-  zsh (the Mac default), fish        Not supported yet.
-
-  Requirements: bash 4.4 or newer. On Windows, Git for Windows, which also
-  runs most commands for PowerShell and CMD.
+       The tstamp commands themselves are not tracked. A pipeline is
+       recorded as one command. Commands run while tracking is off are not
+       recorded.
 
 EXAMPLES
-  tstamp-a                      Turn it on in every window.
-  tstamp stop                   Turn it off.
-  tstamp set 2                  Show only the time of day.
-  tstamp export -o report.txt   Save one timeline of all your windows.
-  tstamp run dir                Time one command (works in CMD).
+       tstamp-a                      Turn it on in every window.
+       tstamp stop                   Turn it off.
+       tstamp set 2                  Show only the time of day.
+       tstamp export -o report.txt   Save one timeline of all your windows.
+       tstamp run dir                Time one command (works in CMD).
 
-  Run "tstamp examples" for more.
+       Run "tstamp examples" for more.
 
-TROUBLESHOOTING
-  "tstamp: command not found"
-      This window does not have tstamp. Open a new terminal. In Command
-      Prompt, open a new window after installing.
+SHELL COMPATIBILITY
+       This lists what automated tests or hand tests have shown. Nothing
+       is claimed beyond it.
 
-  A new Git Bash window does not have tstamp
-      Git Bash reads ~/.bash_profile first. Make sure it loads ~/.bashrc:
-        [ -f ~/.bashrc ] && . ~/.bashrc
+       Where                            Status
+       -------------------------------  ---------------------------------
+       Git Bash on Windows              Tested in CI and by hand,
+                                        including the installer.
+       Windows PowerShell 5.1           Tested in CI and by hand: START
+                                        and END lines, exit codes, shared
+                                        logs and the profile hook.
+       PowerShell 7                     Not tested yet.
+       Command Prompt (CMD)             Cannot be tracked automatically,
+                                        because CMD has no hook. The
+                                        tstamp commands and "tstamp run"
+                                        work there and are tested.
+       Ubuntu, bash                     Tested in CI, including the .deb.
+       macOS, bash 5 (Homebrew)         Tested in CI. The built-in bash
+                                        3.2 is too old.
+       Restart behaviour                Partly tested. A real restart has
+                                        not been tested yet.
+       WSL, other Linux                 Not tested yet.
+       Windows Terminal, IDE terminals  Not tested yet.
+       zsh (the Mac default), fish      Not supported yet.
 
-  tstamp-a changed nothing in an open window
-      Only windows that loaded tstamp follow it. Open a new window.
-
-  "tstamp: another DEBUG trap is already set"
-      Another tool in your bash already uses the hook that tstamp needs.
-      tstamp will not replace it, so it stays off in that window.
-
-  "tstamp: bash 4.4 or newer is required"
-      Check with: bash --version. On a Mac run "brew install bash" and
-      start it by typing: bash
-
-  PowerShell says running scripts is disabled
-      Run this once in PowerShell, then open a new window:
-        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-
-  Nothing is timed in Command Prompt
-      That is expected. Use "tstamp run COMMAND" to time one command.
-
-  Tracking is off after a restart
-      This is intended. Type tstamp-a again.
-
-  "tstamp export: no matching logs"
-      Nothing was tracked yet, or the labels you gave have no logs.
-
-PRIVACY
-  tstamp never connects to the internet. It saves a log of your commands
-  in ~/.tstamp/logs. The log contains the full text of every tracked
-  command, including any password you type inside a command. It is not
-  encrypted. Type "tstamp stop" before typing secrets, and delete logs you
-  no longer need:
-
-    rm -rf ~/.tstamp/logs
-
-INSTALLATION
-  Choose the section for your computer. You only need one.
-
-  Windows
-    1. Install Git for Windows if you do not have it:
-       https://git-scm.com/download/win
-    2. Download tstamp-windows-setup.exe from
-       https://github.com/abinaze/tstamp/releases/latest and open it.
-       If Windows says "unknown publisher" (the installer is not
-       code-signed), choose More info, then Run anyway.
-    3. Keep the boxes for Git Bash, PowerShell, and CMD and PowerShell
-       commands ticked. The installer saves a backup of your startup
-       files first. No administrator rights are needed.
-    4. Open a new Git Bash or PowerShell window and type: tstamp-a
-
-  Ubuntu and Debian
-    1. Download tstamp.deb from the same page.
-    2. Run: sudo apt install ./tstamp.deb
-    3. Run once: tstamp hook add
-    4. Open a new terminal and type: tstamp-a
-
-  Other Linux, Mac and WSL, no sudo
-    Run:
-      curl -fsSL \
-        https://github.com/abinaze/tstamp/releases/latest/download/get.sh \
-        | bash
-    It checks that the download is not damaged and installs into your own
-    folder (~/.local). It changes no startup file unless you add
-    "-s -- --hook" after "bash". Otherwise run "tstamp hook add" later.
-    On a Mac, first run "brew install bash" and type "bash".
-
-  Without installing
-    In one terminal: source /path/to/tstamp/shells/bash.sh
-
-UNINSTALLATION
-  Windows
-    Open Windows Settings, then Apps, find tstamp and choose Uninstall. It
-    removes what it added: the startup-file blocks, the PATH entry and the
-    program files. It asks before deleting your settings and logs; the
-    default answer is No.
-
-  Ubuntu and Debian
-    Run "tstamp hook remove", then: sudo apt remove tstamp
-
-  Other Linux, Mac and WSL
-    Run: bash ~/.local/share/tstamp/uninstall.sh
-
-  Backups of your startup files stay next to them, named like
-  .bashrc.tstamp-backup-DATE-TIME. Delete them when you no longer need them.
+       Requirements: bash 4.4 or newer. On Windows, Git for Windows, which
+       also runs most commands for PowerShell and CMD.
 
 LIMITATIONS
-  Not yet tested: full-screen programs (vim, less, ssh), several commands
-  on one line, background jobs and very long-running commands. Supported:
-  bash and Windows PowerShell 5.1. Command Prompt cannot be tracked
-  automatically.
+       Not yet tested: full-screen programs (vim, less, ssh), several
+       commands on one line, background jobs and very long-running
+       commands. Supported: bash and Windows PowerShell 5.1. Command Prompt
+       cannot be tracked automatically.
+
+PRIVACY
+       tstamp never connects to the internet. It saves a log of your
+       commands in ~/.tstamp/logs. The log contains the full text of every
+       tracked command, including any password you type inside a command.
+       It is not encrypted. Type "tstamp stop" before typing secrets, and
+       delete logs you no longer need:
+
+          rm -rf ~/.tstamp/logs
+
+INSTALLATION
+       Choose the section for your computer. You only need one.
+
+   Windows
+       1. Install Git for Windows if you do not have it:
+          https://git-scm.com/download/win
+       2. Download tstamp-windows-setup.exe from
+          https://github.com/abinaze/tstamp/releases/latest and open it.
+          If Windows says "unknown publisher" (the installer is not
+          code-signed), choose More info, then Run anyway.
+       3. Keep the boxes for Git Bash, PowerShell, and CMD and PowerShell
+          commands ticked. The installer saves a backup of your startup
+          files first. No administrator rights are needed.
+       4. Open a new Git Bash or PowerShell window and type: tstamp-a
+
+   Ubuntu and Debian
+       1. Download tstamp.deb from the same page.
+       2. Run: sudo apt install ./tstamp.deb
+       3. Run once: tstamp hook add
+       4. Open a new terminal and type: tstamp-a
+
+   Other Linux, Mac and WSL (no sudo)
+       Run:
+          curl -fsSL \
+          https://github.com/abinaze/tstamp/releases/latest/download/get.sh \
+          | bash
+
+       It checks that the download is not damaged and installs into your
+       own folder (~/.local). It changes no startup file unless you add
+       "-s -- --hook" after "bash". Otherwise run "tstamp hook add" later.
+       On a Mac, first run "brew install bash" and type "bash".
+
+   Without installing
+       In one terminal: source /path/to/tstamp/shells/bash.sh
+
+UNINSTALLATION
+   Windows
+       Open Windows Settings, then Apps, find tstamp and choose Uninstall.
+       It removes what it added: the startup-file blocks, the PATH entry
+       and the program files. It asks before deleting your settings and
+       logs; the default answer is No.
+
+   Ubuntu and Debian
+       Run "tstamp hook remove", then: sudo apt remove tstamp
+
+   Other Linux, Mac and WSL
+       Run: bash ~/.local/share/tstamp/uninstall.sh
+
+       Backups of your startup files stay next to them, named like
+       .bashrc.tstamp-backup-DATE-TIME. Delete them when you no longer
+       need them.
+
+TROUBLESHOOTING
+       "tstamp: command not found"
+              This window does not have tstamp. Open a new terminal. In
+              Command Prompt, open a new window after installing.
+
+       A new Git Bash window does not have tstamp
+              Git Bash reads ~/.bash_profile first. Make sure it loads
+              ~/.bashrc:
+                 [ -f ~/.bashrc ] && . ~/.bashrc
+
+       tstamp-a changed nothing in an open window
+              Only windows that loaded tstamp follow it. Open a new window.
+
+       "tstamp: another DEBUG trap is already set"
+              Another tool in your bash already uses the hook that tstamp
+              needs. tstamp will not replace it, so it stays off there.
+
+       "tstamp: bash 4.4 or newer is required"
+              Check with: bash --version. On a Mac run
+              "brew install bash" and start it by typing: bash
+
+       PowerShell says running scripts is disabled
+              Run this once in PowerShell, then open a new window:
+                 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+       Nothing is timed in Command Prompt
+              That is expected. Use "tstamp run COMMAND" to time one command.
+
+       Tracking is off after a restart
+              This is intended. Type tstamp-a again.
+
+       "tstamp export: no matching logs"
+              Nothing was tracked yet, or the labels you gave have no logs.
+
+SEE ALSO
+       The documentation pages in the docs folder of the project: the
+       introduction, quick start, commands, timestamp formats, examples,
+       compatibility and troubleshooting.
+       Project page: https://github.com/abinaze/tstamp
