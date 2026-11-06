@@ -57,6 +57,7 @@ has   "iss: uninstall removes the PowerShell block" "$ISS" "RunTstampPS('remove'
 has   "release: checks the PATH entry after install" "$REL" 'GetEnvironmentVariable'
 has   "iss: deleting user data defaults to No" "$ISS" 'MB_DEFBUTTON2'
 has   "stage.sh writes where the installer script reads" "$STAGE" 'dist/stage'
+has   "stage.sh ships the PowerShell integration" "$STAGE" 'shells/powershell.ps1'
 
 # --- old Windows-only workflow is gone ---
 check "installer.yml is gone (release.yml replaces it)" no "$([ -e "$ROOT/.github/workflows/installer.yml" ] && echo yes || echo no)"
