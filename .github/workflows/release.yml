@@ -147,6 +147,10 @@ jobs:
           psprofile="$(cygpath -u "$(powershell -NoProfile -Command '$PROFILE' | tr -d '\r')")"
           grep -qF '# >>> tstamp >>>' "$psprofile"
           cmd //c "$(cygpath -w "$app/bin/tstamp.cmd") version"
+          test -f "$app/shells/powershell.ps1"
+          pstest="$(powershell -NoProfile -ExecutionPolicy Bypass -Command ". \$PROFILE; (Get-Command tstamp-a -ErrorAction Stop).CommandType" 2>&1 | tail -n 1 | tr -d '\r')"
+          echo "tstamp-a after loading the PowerShell profile is a: $pstest"
+          [ "$pstest" = Function ]
 
       - name: Smoke test, silent uninstall
         shell: pwsh
