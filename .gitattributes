@@ -5,3 +5,4 @@ VERSION text eol=lf
 bin/* text eol=lf
 docs/*.txt text eol=lf
 *.cmd text eol=crlf
+*.ps1 text eol=lf
