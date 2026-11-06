@@ -29,6 +29,10 @@ tstamp_profile_add() {
     return 1
   fi
   if [ "$kind" = powershell ]; then
+    if [ ! -f "$root/shells/powershell.ps1" ]; then
+      echo "tstamp: $root/shells/powershell.ps1 was not found, so the PowerShell hook was not added." >&2
+      return 1
+    fi
     win="$(cygpath -w "$root" 2>/dev/null)" || win=""
     if [ -z "$win" ] || [[ "$win" == *"'"* ]] || LC_ALL=C grep -q '[^ -~]' <<<"$win"; then
       echo "tstamp: the install path cannot be used in a PowerShell profile: $root" >&2
