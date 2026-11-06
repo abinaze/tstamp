@@ -16,7 +16,7 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE/bin" "$STAGE/lib" "$STAGE/shells" "$STAGE/docs"
 cp "$ROOT/bin/tstamp" "$ROOT/bin/tstamp-a" "$ROOT"/bin/*.cmd "$STAGE/bin/"
 cp "$ROOT"/lib/*.sh "$STAGE/lib/"
-cp "$ROOT/shells/bash.sh" "$STAGE/shells/"
+cp "$ROOT/shells/bash.sh" "$ROOT/shells/powershell.ps1" "$STAGE/shells/"
 cp "$ROOT"/docs/*.txt "$STAGE/docs/"
 cp "$ROOT/VERSION" "$ROOT/README.md" "$STAGE/"
 if [ -f "$ROOT/LICENSE" ]; then
