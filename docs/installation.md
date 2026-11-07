@@ -3,8 +3,6 @@
 Pick **one** section for your computer. If you are not sure which, look at the
 first line of each section.
 
-> tstamp has not been released yet. The download links work after the first
-> version is published. Until then, see "Try it without installing" below.
 
 ## Windows
 

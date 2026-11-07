@@ -57,9 +57,6 @@ Choose your computer. You only need one.
 curl -fsSL https://github.com/abinaze/tstamp/releases/latest/download/get.sh | bash
 ```
 
-> **Not released yet.** The download links start working when the first version
-> is published. To try tstamp from this repository now, run
-> `source shells/bash.sh` in a bash terminal.
 
 Windows needs [Git for Windows](https://git-scm.com/download/win) (the installer
 checks). On a Mac, use bash 5: `brew install bash`, then type `bash`. Step-by-step
