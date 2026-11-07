@@ -9,7 +9,7 @@ that.
 | Ubuntu, bash | Tested. All tests pass, including installing and removing the `.deb`. |
 | macOS, bash 5 (from Homebrew) | Tested. All tests pass. |
 | macOS built-in bash 3.2 | Not supported. The installer script runs, but tstamp itself needs bash 4.4 or newer. |
-| Restart behaviour | Partly tested. The check works with simulated restarts. A real restart has not been tested yet. |
+| Restart behaviour | Tested on Windows with a real restart (Git Bash and PowerShell). |
 | WSL, other Linux | Not tested yet. |
 | Windows Terminal, VS Code or other terminals running bash | Not tested yet. |
 | Windows PowerShell 5.1 | Tested. START and END lines, exit codes, shared logs and the profile hook are tested in CI and were tried by hand on Windows 11. |
