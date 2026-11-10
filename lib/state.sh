@@ -49,7 +49,16 @@ tstamp_boot_same() {
   [ "$a" = "$b" ]
 }
 
+# Sets TSTAMP_NONCE to a fresh value that is different every time.
+tstamp_new_nonce() {
+  local t="${EPOCHSECONDS:-$(date +%s)}"
+  TSTAMP_NONCE="$t-$$-$RANDOM$RANDOM"
+}
+
 # Create the global flag: tracking on for every hooked terminal until reboot.
+# Each call writes a new "gen" value. A terminal that was stopped with
+# "tstamp stop" remembers the gen it stopped under, so it stays off until the
+# next tstamp-a writes a new one.
 tstamp_global_enable() {
   local f tmp now
   mkdir -p "$TSTAMP_HOME" || return 1
@@ -57,30 +66,51 @@ tstamp_global_enable() {
   f="$TSTAMP_HOME/enabled"
   tmp="$f.tmp.$$"
   now="${EPOCHSECONDS:-$(date +%s)}"
-  printf 'boot=%s\nsince=%s\n' "$TSTAMP_BOOT" "$now" > "$tmp" && mv "$tmp" "$f"
+  tstamp_new_nonce
+  printf 'boot=%s\nsince=%s\ngen=%s\n' "$TSTAMP_BOOT" "$now" "$TSTAMP_NONCE" > "$tmp" && mv "$tmp" "$f"
 }
 
+# Stop tracking in every terminal: remove the global flag and write a new
+# "stopall" value, which also stops terminals that were turned on by hand.
 tstamp_global_disable() {
+  local f tmp
+  mkdir -p "$TSTAMP_HOME" || return 1
   rm -f "$TSTAMP_HOME/enabled"
+  f="$TSTAMP_HOME/stopall"
+  tmp="$f.tmp.$$"
+  tstamp_new_nonce
+  printf '%s\n' "$TSTAMP_NONCE" > "$tmp" && mv "$tmp" "$f"
 }
 
-# Sets TSTAMP_GLOBAL to on, off or stale, and TSTAMP_GLOBAL_SINCE.
-# "stale" means a flag exists but was written before the last reboot.
+# Sets TSTAMP_STOPALL to the current stopall value (empty if there is none).
+tstamp_stopall_read() {
+  TSTAMP_STOPALL=""
+  [ -f "$TSTAMP_HOME/stopall" ] && read -r TSTAMP_STOPALL < "$TSTAMP_HOME/stopall"
+  return 0
+}
+
+# Sets TSTAMP_GLOBAL to on, off or stale, TSTAMP_GLOBAL_SINCE, and
+# TSTAMP_GLOBAL_GEN (the value written by the latest tstamp-a; "legacy" for
+# a flag written without one). "stale" means a flag exists but was written
+# before the last reboot.
 tstamp_global_state() {
-  local f="$TSTAMP_HOME/enabled" k v boot="" since=""
+  local f="$TSTAMP_HOME/enabled" k v boot="" since="" gen=""
   TSTAMP_GLOBAL="off"
   TSTAMP_GLOBAL_SINCE=""
+  TSTAMP_GLOBAL_GEN=""
   [ -f "$f" ] || return 0
   while IFS='=' read -r k v || [ -n "$k" ]; do
     case "$k" in
       boot) boot="$v" ;;
       since) since="$v" ;;
+      gen) gen="$v" ;;
     esac
   done < "$f"
   [ -n "${TSTAMP_BOOT:-}" ] || tstamp_boot_token
   if tstamp_boot_same "$boot" "$TSTAMP_BOOT"; then
     TSTAMP_GLOBAL="on"
     TSTAMP_GLOBAL_SINCE="$since"
+    TSTAMP_GLOBAL_GEN="${gen:-legacy}"
   else
     TSTAMP_GLOBAL="stale"
   fi
@@ -119,6 +149,31 @@ tstamp_cmd_global_on() {
   echo "Global tracking enabled."
   echo "Terminals with the TStamp hook loaded start tracking at their next prompt."
   echo "Tracking turns off after a reboot."
+}
+
+# Usage: tstamp_cmd_global_stop
+# "tstamp-a stop": stop tracking in every terminal.
+tstamp_cmd_global_stop() {
+  if ! tstamp_global_disable; then
+    echo "tstamp-a: cannot write state in $TSTAMP_HOME" >&2
+    return 1
+  fi
+  echo "Global tracking stopped."
+  echo "Terminals with the shell hook stop at their next prompt."
+}
+
+# Usage: tstamp_cmd_global [stop | FORMAT]
+# Shared by "tstamp-a" (hooked shell) and "tstamp global-on" (standalone).
+tstamp_cmd_global() {
+  if [ "${1:-}" = stop ]; then
+    if [ "$#" -gt 1 ]; then
+      echo "usage: tstamp-a stop" >&2
+      return 2
+    fi
+    tstamp_cmd_global_stop
+    return
+  fi
+  tstamp_cmd_global_on "$@"
 }
 
 tstamp_print_global_status() {
