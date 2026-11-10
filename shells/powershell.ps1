@@ -14,6 +14,7 @@ $global:__TS = @{
   Root = (Split-Path -Parent $PSScriptRoot)
   Home = $(if ($env:TSTAMP_HOME) { $env:TSTAMP_HOME } else { Join-Path $env:USERPROFILE '.tstamp' })
   Local = $false; LocalFmt = ''; Sid = ''; Log = ''; Boot = ''
+  StopSeen = ''; MutedGen = ''
   Pending = $null; Start = [long]0; Prev = $null; Err0 = $null; Fmt = ''
   Prompt = $null; PrevHandler = $null
 }
@@ -94,12 +95,46 @@ function global:__ts_same_boot {
   [math]::Abs($x - $y) -le 120
 }
 
-function global:__ts_global_on {
+# Returns the "gen" value of the global flag when global tracking is on for
+# this boot ("legacy" for a flag written without one), otherwise $null.
+function global:__ts_global_gen {
   $f = Join-Path $global:__TS.Home 'enabled'
-  if (-not (Test-Path -LiteralPath $f)) { return $false }
-  $boot = ''
-  try { foreach ($l in [IO.File]::ReadAllLines($f)) { if ($l.StartsWith('boot=')) { $boot = $l.Substring(5) } } } catch { return $false }
-  __ts_same_boot $boot (__ts_boot)
+  if (-not (Test-Path -LiteralPath $f)) { return $null }
+  $boot = ''; $gen = ''
+  try {
+    foreach ($l in [IO.File]::ReadAllLines($f)) {
+      if ($l.StartsWith('boot=')) { $boot = $l.Substring(5) }
+      elseif ($l.StartsWith('gen=')) { $gen = $l.Substring(4) }
+    }
+  } catch { return $null }
+  if (-not (__ts_same_boot $boot (__ts_boot))) { return $null }
+  if ($gen) { return $gen }
+  'legacy'
+}
+
+function global:__ts_global_on {
+  $null -ne (__ts_global_gen)
+}
+
+# Returns the current "stopall" value (empty when there is none).
+function global:__ts_stopall {
+  $f = Join-Path $global:__TS.Home 'stopall'
+  if (-not (Test-Path -LiteralPath $f)) { return '' }
+  try { ([IO.File]::ReadAllText($f)).Trim() } catch { '' }
+}
+
+# True when this terminal should track the next command: it was turned on
+# here (and "tstamp-a stop" has not been typed anywhere since), or global
+# tracking is on and this terminal was not stopped under the current tstamp-a.
+function global:__ts_enabled {
+  if ($global:__TS.Local) {
+    if ((__ts_stopall) -eq $global:__TS.StopSeen) { return $true }
+    $global:__TS.Local = $false
+    $global:__TS.LocalFmt = ''
+  }
+  $g = __ts_global_gen
+  if ($null -eq $g) { return $false }
+  $g -ne $global:__TS.MutedGen
 }
 
 function global:__ts_session {
@@ -144,7 +179,7 @@ function global:__ts_submit {
   param([string]$line)
   $t = $line.Trim()
   if (-not $t -or $t -match '^(tstamp|tstamp-a|exit|logout)(\s|$)') { return }
-  if (-not ($global:__TS.Local -or (__ts_global_on))) { return }
+  if (-not (__ts_enabled)) { return }
   if (-not (__ts_session)) { return }
   $want = if ($global:__TS.LocalFmt) { $global:__TS.LocalFmt } else { __ts_config_format }
   $fmt = __ts_fmt_string $want
@@ -188,17 +223,30 @@ function global:__ts_save_format {
   [IO.File]::WriteAllText($f, ((@("format=$fmt") + $keep) -join "`n") + "`n", (New-Object Text.UTF8Encoding($false)))
 }
 
+function global:__ts_write_file {
+  param([string]$name, [string]$text)
+  [void][IO.Directory]::CreateDirectory($global:__TS.Home)
+  $f = Join-Path $global:__TS.Home $name
+  [IO.File]::WriteAllText("$f.tmp", $text, (New-Object Text.UTF8Encoding($false)))
+  Move-Item -LiteralPath "$f.tmp" -Destination $f -Force
+}
+
 function global:tstamp-a {
   param([string]$Format)
+  if ($Format -eq 'stop') {
+    $f = Join-Path $global:__TS.Home 'enabled'
+    Remove-Item -LiteralPath $f -ErrorAction SilentlyContinue
+    __ts_write_file 'stopall' ("{0}`n" -f [guid]::NewGuid().ToString('N'))
+    Write-Host 'Global tracking stopped.'
+    Write-Host 'Terminals with the shell hook stop at their next prompt.'
+    return
+  }
   if ($Format) {
     if (-not (__ts_fmt_string $Format)) { Write-Error "tstamp-a: invalid format: $Format"; return }
     __ts_save_format $Format
   }
-  [void][IO.Directory]::CreateDirectory($global:__TS.Home)
-  $f = Join-Path $global:__TS.Home 'enabled'
-  $text = "boot={0}`nsince={1}`n" -f (__ts_boot), [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-  [IO.File]::WriteAllText("$f.tmp", $text, (New-Object Text.UTF8Encoding($false)))
-  Move-Item -LiteralPath "$f.tmp" -Destination $f -Force
+  $text = "boot={0}`nsince={1}`ngen={2}`n" -f (__ts_boot), [DateTimeOffset]::UtcNow.ToUnixTimeSeconds(), [guid]::NewGuid().ToString('N')
+  __ts_write_file 'enabled' $text
   Write-Host 'Global tracking enabled.'
   Write-Host 'Terminals with the TStamp hook loaded start tracking at their next prompt.'
   Write-Host 'Tracking turns off after a reboot.'
@@ -211,6 +259,8 @@ function global:tstamp {
     if ($c -and -not (__ts_fmt_string $c)) { Write-Error "tstamp: invalid format: $c"; return }
     if (-not (__ts_session)) { Write-Error 'tstamp: cannot create session state'; return }
     $global:__TS.LocalFmt = $c
+    $global:__TS.StopSeen = (__ts_stopall)
+    $global:__TS.MutedGen = ''
     $global:__TS.Local = $true
     Write-Host ("Tracking enabled in this terminal (session {0})." -f $global:__TS.Sid)
     return
@@ -219,17 +269,21 @@ function global:tstamp {
     'stop' {
       $global:__TS.Local = $false
       $global:__TS.LocalFmt = ''
-      Remove-Item -LiteralPath (Join-Path $global:__TS.Home 'enabled') -ErrorAction SilentlyContinue
-      Write-Host 'Tracking stopped globally and in this terminal.'
+      $g = __ts_global_gen
+      if ($null -ne $g) { $global:__TS.MutedGen = $g }
+      Write-Host 'Tracking stopped in this terminal. Other terminals are not affected.'
+      Write-Host 'To stop everywhere, type: tstamp-a stop'
     }
     'status' {
-      $state = if ($global:__TS.Local) { 'on' } elseif (__ts_global_on) { 'on (global)' } else { 'off' }
+      $g = __ts_global_gen
+      $state = 'off'
+      if (__ts_enabled) { $state = if ($global:__TS.Local) { 'on' } else { 'on (global)' } } elseif ($null -ne $g) { $state = 'off (stopped here; global tracking is on elsewhere)' }
       $want = if ($global:__TS.LocalFmt) { $global:__TS.LocalFmt } else { __ts_config_format }
       Write-Host ('This terminal : {0}' -f $state)
       Write-Host ('Session ID    : {0}' -f $(if ($global:__TS.Sid) { $global:__TS.Sid } else { 'not assigned yet' }))
       Write-Host ('Format here   : {0}' -f (__ts_fmt_string $want))
       Write-Host ('State dir     : {0}' -f $global:__TS.Home)
-      Write-Host ('Global        : {0}' -f $(if (__ts_global_on) { 'on' } else { 'off' }))
+      Write-Host ('Global        : {0}' -f $(if ($null -ne $g) { 'on' } else { 'off' }))
     }
     default { __ts_delegate $a }
   }
