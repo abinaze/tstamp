@@ -68,7 +68,7 @@ jobs:
           tstamp version
           tstamp-a 2
           tstamp status
-          tstamp stop
+          tstamp-a stop
           tstamp hook add --yes "$HOME/.bashrc"
           tstamp hook remove --yes "$HOME/.bashrc"
           sudo apt-get remove -y tstamp
