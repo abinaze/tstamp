@@ -3,7 +3,8 @@ tstamp - local-first terminal timestamp utility
 USAGE
   tstamp [FORMAT]        Enable tracking in this terminal
   tstamp-a [FORMAT]      Enable tracking in all hooked terminals
-  tstamp stop            Stop tracking globally and in this terminal
+  tstamp stop            Stop tracking in this terminal only
+  tstamp-a stop          Stop tracking in every terminal
   tstamp status          Show global and this-terminal status
   tstamp format          List the timestamp formats
   tstamp set FORMAT      Change the default format

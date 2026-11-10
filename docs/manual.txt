@@ -6,6 +6,7 @@ SYNOPSIS
        tstamp [FORMAT]
        tstamp-a [FORMAT]
        tstamp stop
+       tstamp-a stop
        tstamp status
        tstamp format
        tstamp set FORMAT
@@ -39,7 +40,7 @@ GETTING STARTED
        2. Type: tstamp-a
        3. Run any command, for example: echo hello
           You now see a START and an END line.
-       4. Type: tstamp stop
+       4. Type: tstamp-a stop
 
        Tracking switches itself off when the computer restarts. Type
        tstamp-a again to turn it back on.
@@ -57,10 +58,15 @@ COMMANDS
               window only. Needs tstamp to be loaded in this window.
 
        tstamp stop
-              Turn tracking off everywhere and in this window. Other
-              windows stop at their next prompt. A window where you typed
-              "tstamp" yourself keeps tracking until you type
-              "tstamp stop" in that window.
+              Turn tracking off in this window only. Other windows are not
+              affected. If the global switch is on, this window stays off
+              until the next "tstamp-a". Type "tstamp" to turn it on again
+              in this window alone.
+
+       tstamp-a stop
+              Turn tracking off in every window. Windows with tstamp
+              loaded stop at their next prompt, including windows where
+              you typed "tstamp" yourself.
 
        tstamp status
               Show whether tracking is on in this window, this window's
@@ -154,6 +160,7 @@ FILES AND CONFIGURATION
        ~/.tstamp/enabled   Exists only while the global switch is on. It
                            remembers which start-up of the computer made
                            it, and is ignored after the next restart.
+       ~/.tstamp/stopall   Changes each time you type "tstamp-a stop".
        ~/.tstamp/sessions/ One small folder for each open window.
        ~/.tstamp/logs/     One log file for each window.
 
@@ -181,7 +188,8 @@ OUTPUT AND LOGS
 
 EXAMPLES
        tstamp-a                      Turn it on in every window.
-       tstamp stop                   Turn it off.
+       tstamp stop                   Turn it off in this window.
+       tstamp-a stop                 Turn it off in every window.
        tstamp set 2                  Show only the time of day.
        tstamp export -o report.txt   Save one timeline of all your windows.
        tstamp run dir                Time one command (works in CMD).
@@ -207,8 +215,8 @@ SHELL COMPATIBILITY
        Ubuntu, bash                     Tested in CI, including the .deb.
        macOS, bash 5 (Homebrew)         Tested in CI. The built-in bash
                                         3.2 is too old.
-       Restart behaviour                Partly tested. A real restart has
-                                        not been tested yet.
+       Restart behaviour                Tested with a real restart in
+                                        Git Bash. Not yet in PowerShell.
        WSL, other Linux                 Not tested yet.
        Windows Terminal, IDE terminals  Not tested yet.
        zsh (the Mac default), fish      Not supported yet.
@@ -226,8 +234,8 @@ PRIVACY
        tstamp never connects to the internet. It saves a log of your
        commands in ~/.tstamp/logs. The log contains the full text of every
        tracked command, including any password you type inside a command.
-       It is not encrypted. Type "tstamp stop" before typing secrets, and
-       delete logs you no longer need:
+       It is not encrypted. Type "tstamp stop" in that window before
+       typing secrets, and delete logs you no longer need:
 
           rm -rf ~/.tstamp/logs
 

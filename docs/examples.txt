@@ -12,8 +12,11 @@ Use a custom format in this terminal only:
 Enable tracking in every terminal that has the hook, using format 4:
   tstamp-a 4
 
-Stop tracking everywhere (and in this terminal):
+Stop tracking in this terminal only:
   tstamp stop
+
+Stop tracking in every terminal:
+  tstamp-a stop
 
 Change the saved default format:
   tstamp set 5
