@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # TStamp command dispatcher.
 # Per-terminal commands (tstamp, tstamp N, and tstamp stop for the current
-# terminal) are provided by shells/bash.sh. This script handles everything
+# terminal) are provided by shells/bash.sh; tstamp-a stop stops every terminal. This script handles everything
 # that does not need to change the shell it runs in.
 
 set -u
@@ -75,13 +75,12 @@ case "$cmd" in
     ;;
   global-on)
     shift
-    tstamp_cmd_global_on "$@"
+    tstamp_cmd_global "$@"
     exit $?
     ;;
   stop)
-    tstamp_global_disable || exit 1
-    echo "Global tracking stopped."
-    echo "Terminals with the shell hook stop at their next prompt."
+    echo "Nothing is tracked in this window, so there is nothing to stop here."
+    echo "To stop tracking in every terminal, type: tstamp-a stop"
     ;;
   status)
     echo "Standalone status (a hooked terminal also shows its own state):"
