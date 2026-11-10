@@ -313,10 +313,21 @@ function global:prompt {
   & $global:__TS.Prompt
 }
 
+# PSReadLine calls the history handler once for every line of the saved history
+# when it starts, with an empty command line. A command that was really typed
+# is still in the command line at that moment, so the two texts match.
+# If the command line cannot be read, assume the line was typed.
+function global:__ts_live_line {
+  param([string]$line)
+  $b = $null; $c = $null
+  try { [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$b, [ref]$c) } catch { return $true }
+  (([string]$b) -replace "`r", '').Trim() -eq ($line -replace "`r", '').Trim()
+}
+
 try {
   Set-PSReadLineOption -AddToHistoryHandler {
     param([string]$line)
-    $null = __ts_submit $line
+    if (__ts_live_line $line) { $null = __ts_submit $line }
     if ($global:__TS.PrevHandler) { & $global:__TS.PrevHandler $line } else { $true }
   }
 } catch {
