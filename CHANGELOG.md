@@ -13,8 +13,10 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 - START and END lines with exit code and duration for every command in
   bash: `tstamp` and `tstamp N`.
-- Global tracking across terminals: `tstamp-a`, `tstamp stop` and
+- Global tracking across terminals: `tstamp-a`, `tstamp-a stop` and
   `tstamp status`. Global tracking switches off after a reboot.
+- `tstamp stop` stops only the terminal where it is typed; `tstamp-a stop`
+  stops every terminal, including those turned on by hand.
 - Per-terminal session IDs (T1, T2, ...) and one log file per terminal.
 - Five built-in timestamp formats and custom date format strings:
   `tstamp format`, `tstamp set` and `tstamp reset`.
