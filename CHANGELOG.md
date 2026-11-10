@@ -17,6 +17,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
   `tstamp status`. Global tracking switches off after a reboot.
 - `tstamp stop` stops only the terminal where it is typed; `tstamp-a stop`
   stops every terminal, including those turned on by hand.
+- PowerShell ignores the saved history that PSReadLine replays when it starts,
+  so a new window no longer prints old START lines.
 - Per-terminal session IDs (T1, T2, ...) and one log file per terminal.
 - Five built-in timestamp formats and custom date format strings:
   `tstamp format`, `tstamp set` and `tstamp reset`.
