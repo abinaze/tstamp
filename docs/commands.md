@@ -6,7 +6,8 @@ Type these in a terminal where tstamp is installed.
 |---|---|
 | `tstamp-a [FORMAT]` | Turn on in **every** terminal that has tstamp loaded |
 | `tstamp [FORMAT]` | Turn on in **this** terminal only |
-| `tstamp stop` | Turn off everywhere and in this terminal |
+| `tstamp stop` | Turn off in this terminal only |
+| `tstamp-a stop` | Turn off in **every** terminal |
 | `tstamp status` | Show what is on |
 | `tstamp format` | List the time styles, with live examples |
 | `tstamp set FORMAT` | Save a new default time style |
@@ -37,9 +38,18 @@ applies to this window only.
 
 ## tstamp stop
 
-Turns off global tracking and tracking in this window. Other windows stop at
-their next prompt. A window where you typed `tstamp` yourself keeps going until
-you type `tstamp stop` in it.
+Turns tracking off in this window only. Other windows are not affected. If
+global tracking is on, this window stays off until the next `tstamp-a`. Type
+`tstamp` to turn it on again in this window alone.
+
+In a window where tstamp is not loaded (for example Command Prompt) there is
+nothing to stop, and `tstamp stop` says so.
+
+## tstamp-a stop
+
+Turns tracking off in every window. Windows that have tstamp loaded stop at
+their next prompt, including windows where you typed `tstamp` yourself. Type
+`tstamp-a` to start again.
 
 ## tstamp status
 
@@ -98,12 +108,13 @@ commands, so `tstamp run dir` and `tstamp run ver` work.
 | `~/.tstamp/config` | Your saved time style |
 | `~/.tstamp/logs/` | One log file per window |
 | `~/.tstamp/enabled` | Exists only while global tracking is on |
+| `~/.tstamp/stopall` | Changes every time you type `tstamp-a stop` |
 
 ## Privacy
 
 The logs contain the full text of every command, including any password you
 type inside a command. They are not encrypted and never leave your computer. Run
-`tstamp stop` before typing secrets, and delete logs you no longer need:
+`tstamp stop` in that window before typing secrets, and delete logs you no longer need:
 
 ```bash
 rm -rf ~/.tstamp/logs

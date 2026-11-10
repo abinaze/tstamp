@@ -48,7 +48,8 @@ It shows whether tstamp is on, this window's label (`T1`), and the time style.
 ## 5. Turn it off
 
 ```bash
-tstamp stop
+tstamp stop      # this window only
+tstamp-a stop    # every window
 ```
 
 ## Good to know

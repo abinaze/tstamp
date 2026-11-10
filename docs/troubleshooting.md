@@ -27,9 +27,15 @@ different terminal.
 Your bash is too old. Check with `bash --version`. On a Mac, run
 `brew install bash` and start it by typing `bash`.
 
-## Nothing is shown after `tstamp stop` elsewhere, but one window still tracks
+## One window still tracks after I stopped it in another window
 
-That window was turned on with `tstamp`. Type `tstamp stop` in it.
+`tstamp stop` only stops the window where you type it. To stop every window,
+type `tstamp-a stop`.
+
+## A window stays off after I typed `tstamp stop` in it
+
+This is intended: it stays off while global tracking is on. Type `tstamp-a` to
+turn every window back on, or `tstamp` to turn on this window alone.
 
 ## It stopped working after a restart
 

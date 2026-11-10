@@ -44,7 +44,8 @@ The state folder is `~/.tstamp`, or `$TSTAMP_HOME` when that is set.
 | Path | Meaning |
 |---|---|
 | `config` | Plain `key=value` file; currently `format=` |
-| `enabled` | Exists only while global tracking is on; records the boot it was created in |
+| `enabled` | Exists only while global tracking is on; records the boot it was created in and a `gen` value that changes with every `tstamp-a` |
+| `stopall` | A value that changes with every `tstamp-a stop` |
 | `sessions/Tn/pid` | One folder per live terminal |
 | `logs/Tn-PID.log` | One log file per terminal |
 
@@ -62,6 +63,12 @@ errors from different terminals easy to tell apart.
 `tstamp-a` creates the `enabled` file. Every hooked terminal checks for it
 at each prompt, so tracking starts and stops without restarting terminals.
 Terminals that never loaded the hook cannot follow it.
+
+`tstamp stop` stops one terminal. When global tracking is on, that terminal
+remembers the `gen` value it stopped under and stays off until the next
+`tstamp-a` writes a new one. `tstamp-a stop` removes `enabled` and writes a
+new `stopall` value; a terminal turned on by hand with `tstamp` compares the
+value it saw then with the current one, and stops when they differ.
 
 The file stores a boot token. Where `/proc/sys/kernel/random/boot_id`
 exists it is used. Git Bash has no such file, so the boot time is estimated

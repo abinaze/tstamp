@@ -68,7 +68,8 @@ help, including uninstalling, is in [Installation](docs/installation.md).
 tstamp-a          # turn it on in every terminal
 echo hello        # run anything: you now see START and END lines
 tstamp status     # see what is on
-tstamp stop       # turn it off
+tstamp stop       # turn it off in this terminal
+tstamp-a stop     # turn it off in every terminal
 ```
 
 Open a **new** terminal first (Git Bash or PowerShell on Windows). Tracking switches itself off when the computer
@@ -81,7 +82,8 @@ restarts: type `tstamp-a` again. The full walk-through is in the
 |---|---|
 | `tstamp-a` | Turn on in all terminals |
 | `tstamp` | Turn on in this terminal only |
-| `tstamp stop` | Turn off |
+| `tstamp stop` | Turn off in this terminal only |
+| `tstamp-a stop` | Turn off in every terminal |
 | `tstamp status` | Show what is on |
 | `tstamp format` / `tstamp set 2` | See and choose the time style |
 | `tstamp export` | Merge all windows into one timeline |
@@ -122,7 +124,7 @@ Details and requirements: [Compatibility](docs/compatibility.md).
 
 tstamp never connects to the internet. It saves a log of your commands in
 `~/.tstamp/logs`. **A password typed inside a command is saved in that log.**
-Type `tstamp stop` before doing that, and delete old logs. Security problems
+Type `tstamp stop` in that terminal before doing that, and delete old logs. Security problems
 should be reported privately: see [SECURITY.md](SECURITY.md).
 
 ## Contributing

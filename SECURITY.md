@@ -31,7 +31,7 @@ within a week.
 - Logs contain the full text of every tracked command, including any
   secret typed on a command line. They are stored unencrypted in
   `~/.tstamp/logs` and are readable by your own user account. Run
-  `tstamp stop` before typing secrets, and delete old logs.
+  `tstamp stop` in that terminal before typing secrets, and delete old logs.
 - The Windows installer is not code-signed. Compare your download with
   `SHA256SUMS.txt` from the same release page.
 - The hook adds one block, marked `# >>> tstamp >>>` and
