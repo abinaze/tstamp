@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # TStamp integration for bash (Git Bash first). Source this file; do not execute it.
-# Phase 5: per-terminal tracking plus global tracking (tstamp-a, tstamp stop).
+# Per-terminal tracking (tstamp, tstamp stop) plus global tracking
+# (tstamp-a, tstamp-a stop).
 # This file is sourced into an interactive shell, so it must never use
 # "set -e" or "set -u".
 
@@ -44,6 +45,8 @@ __TSTAMP_LOADED=1
 tstamp_boot_token           # reboot token, computed once per terminal
 __tstamp_local=0            # 1 = tracking is on in this terminal
 __tstamp_local_fmt=""       # format chosen with "tstamp N" (empty = use default)
+__tstamp_stopall_seen=""    # stopall value when "tstamp" turned this terminal on
+__tstamp_muted_gen=""       # global gen this terminal was stopped under
 __tstamp_armed=0            # 1 = next DEBUG event is a user command
 __tstamp_active=0           # 1 = a tracked command is running
 __tstamp_sid=""             # session ID, for example T1
@@ -59,12 +62,21 @@ __tstamp_setret() {
 }
 
 # Succeeds if this terminal should track the next command:
-# tracking was enabled here, or the global flag is on for this boot.
+# tracking was enabled here (and "tstamp-a stop" has not been typed anywhere
+# since), or the global flag is on for this boot and this terminal was not
+# stopped under the current tstamp-a.
 __tstamp_enabled() {
-  [ "$__tstamp_local" = 1 ] && return 0
+  if [ "$__tstamp_local" = 1 ]; then
+    tstamp_stopall_read
+    if [ "$TSTAMP_STOPALL" = "$__tstamp_stopall_seen" ]; then
+      return 0
+    fi
+    __tstamp_local=0
+    __tstamp_local_fmt=""
+  fi
   [ -e "$TSTAMP_HOME/enabled" ] || return 1
   tstamp_global_state
-  [ "$TSTAMP_GLOBAL" = on ]
+  [ "$TSTAMP_GLOBAL" = on ] && [ "$TSTAMP_GLOBAL_GEN" != "$__tstamp_muted_gen" ]
 }
 
 # Claim the lowest free session ID (T1, T2, ...). Slots whose shell has
@@ -200,6 +212,9 @@ tstamp() {
         return 1
       fi
       __tstamp_local_fmt="$want"
+      tstamp_stopall_read
+      __tstamp_stopall_seen="$TSTAMP_STOPALL"
+      __tstamp_muted_gen=""
       __tstamp_local=1
       __tstamp_resolve_format
       printf 'Tracking enabled in this terminal (session %s).\n' "$__tstamp_sid"
@@ -208,15 +223,20 @@ tstamp() {
     stop)
       __tstamp_local=0
       __tstamp_local_fmt=""
-      tstamp_global_disable
-      echo "Tracking stopped globally and in this terminal."
+      tstamp_global_state
+      if [ "$TSTAMP_GLOBAL" = on ]; then
+        __tstamp_muted_gen="$TSTAMP_GLOBAL_GEN"
+      fi
+      echo "Tracking stopped in this terminal. Other terminals are not affected."
+      echo "To stop everywhere, type: tstamp-a stop"
       ;;
     status)
       local state=off
-      if [ "$__tstamp_local" = 1 ]; then
-        state=on
-      elif __tstamp_enabled; then
-        state="on (global)"
+      tstamp_global_state
+      if __tstamp_enabled; then
+        if [ "$__tstamp_local" = 1 ]; then state=on; else state="on (global)"; fi
+      elif [ "$TSTAMP_GLOBAL" = on ]; then
+        state="off (stopped here; global tracking is on elsewhere)"
       fi
       __tstamp_resolve_format
       printf 'This terminal : %s\n' "$state"
@@ -232,8 +252,9 @@ tstamp() {
 }
 
 # Enable tracking in every terminal that has the hook loaded.
+# "tstamp-a stop" stops tracking in every terminal.
 tstamp-a() {
-  tstamp_cmd_global_on "$@"
+  tstamp_cmd_global "$@"
 }
 
 __tstamp_install() {
