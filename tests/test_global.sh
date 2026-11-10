@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Cross-terminal test, run entirely in the foreground (Git Bash suspends
 # background interactive shells).
-# Terminal A is a live hooked shell. It runs tstamp-a and tstamp stop as
+# Terminal A is a live hooked shell. It runs tstamp-a and tstamp-a stop as
 # separate processes, exactly like another window would.
 # Terminal B is a new terminal opened while global tracking is on.
 
@@ -24,7 +24,7 @@ echo B-on-1
 tstamp status
 exit
 INNER
-bash "$ROOT/bin/tstamp" stop
+bash "$ROOT/bin/tstamp-a" stop
 echo A-off-3
 exit
 INPUT
@@ -67,8 +67,8 @@ has   "A: status shows session T1" 'Session ID +: T1$'
 has   "status shows global on" 'Global +: on \(since '
 has   "B: new terminal tracked from its first command" "^\[T2\]\[$T\] START: echo B-on-1\$"
 has   "B: END line has exit code and duration" 'END: echo B-on-1 \| EXIT=0 \| DURATION=[0-9]+\.[0-9]{2}s$'
-has   "tstamp stop reports success" '^Global tracking stopped\.$'
-hasnt "A: not tracked after tstamp stop" 'START: echo A-off-3'
+has   "tstamp-a stop reports success" '^Global tracking stopped\.$'
+hasnt "A: not tracked after tstamp-a stop" 'START: echo A-off-3'
 has   "A: command still ran after stop" '^A-off-3$'
 check "global flag removed" no "$([ -e "$TSTAMP_HOME/enabled" ] && echo yes || echo no)"
 

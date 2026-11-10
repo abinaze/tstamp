@@ -40,8 +40,8 @@ has "from CMD, run uses CMD's own ver command" 'Microsoft Windows' "$out"
 out="$(cmd //c "$BATA 2" 2>&1 | tr -d '\r')"
 has "tstamp-a works from CMD" 'Global tracking enabled\.' "$out"
 check "tstamp-a saved the format" "format=2" "$(grep '^format=' "$TSTAMP_HOME/config" | tr -d '\r')"
-cmd //c "$BAT stop" >/dev/null 2>&1
-check "tstamp stop works from CMD" no "$([ -e "$TSTAMP_HOME/enabled" ] && echo yes || echo no)"
+cmd //c "$BATA stop" >/dev/null 2>&1
+check "tstamp-a stop works from CMD" no "$([ -e "$TSTAMP_HOME/enabled" ] && echo yes || echo no)"
 
 out="$(TSTAMP_BASH='C:\no-such-folder\bash.exe' cmd //c "$BAT version" 2>&1 | tr -d '\r')"
 has "a missing Git Bash gives a clear message" 'Git Bash was not found' "$out"

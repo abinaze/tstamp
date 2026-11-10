@@ -69,8 +69,8 @@ check "wrapper runs the installed program" "tstamp $V" "$("$B/tstamp" version)"
 
 "$B/tstamp-a" 2 >/dev/null 2>&1
 check "tstamp-a wrapper enables global tracking" yes "$(exists "$TSTAMP_HOME/enabled")"
-"$B/tstamp" stop >/dev/null 2>&1
-check "tstamp stop wrapper disables it" no "$(exists "$TSTAMP_HOME/enabled")"
+"$B/tstamp-a" stop >/dev/null 2>&1
+check "tstamp-a stop wrapper disables it" no "$(exists "$TSTAMP_HOME/enabled")"
 
 # --- install with the hook, then reinstall ---
 HOME="$H" bash "$D/install.sh" --prefix "$P" --bin "$B" --hook >/dev/null 2>&1
