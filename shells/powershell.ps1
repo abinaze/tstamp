@@ -297,7 +297,8 @@ function global:prompt {
   $code = $global:LASTEXITCODE
   if ($global:__TS.Pending) {
     $us = __ts_us
-    if ($code -ne $global:__TS.Prev) { $exit = [int]$code }
+    if ($null -ne $global:__TS.CmdExit) { $exit = [int]$global:__TS.CmdExit; $global:__TS.CmdExit = $null }
+    elseif ($code -ne $global:__TS.Prev) { $exit = [int]$code }
     elseif ($ok) { $exit = 0 }
     else {
       $errNew = ($global:Error.Count -gt 0) -and -not [object]::ReferenceEquals($global:Error[0], $global:__TS.Err0)
