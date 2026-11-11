@@ -7,6 +7,13 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Command Prompt session (experimental): typing `tstamp` in Command Prompt starts
+  a tracked session in the same window. Each line runs in `cmd.exe` with START
+  and END lines, exit code, duration and the shared logs. It uses only Windows
+  PowerShell 5.1 and `cmd.exe` and changes nothing on the computer.
+
 ## [0.1.0] - 2026-11-11
 
 ### Added
