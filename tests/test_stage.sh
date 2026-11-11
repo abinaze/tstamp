@@ -27,14 +27,14 @@ check "stage.sh can run twice" 0 "$?"
 
 for f in bin/tstamp bin/tstamp-a lib/config.sh lib/format.sh lib/clock.sh lib/state.sh \
          lib/export.sh lib/profile.sh shells/bash.sh shells/powershell.ps1 bin/tstamp.cmd bin/tstamp-a.cmd lib/run.sh docs/help.txt docs/manual.txt \
-         docs/examples.txt VERSION README.md; do
+         docs/examples.txt VERSION README.md shells/clink/tstamp.lua; do
   check "staged $f" yes "$(exists "$S/$f")"
 done
 
 check "tests are not staged" no "$(exists "$S/tests")"
 check "installer sources are not staged" no "$(exists "$S/installer")"
 check "git files are not staged" no "$(exists "$S/.git")"
-check "no CRLF in staged scripts" 0 "$(cat "$S"/bin/tstamp "$S"/bin/tstamp-a "$S"/lib/* "$S"/shells/* "$S/VERSION" | tr -cd "\r" | wc -c | tr -d ' ')"
+check "no CRLF in staged scripts" 0 "$(cat "$S"/bin/tstamp "$S"/bin/tstamp-a "$S"/lib/* "$S"/shells/*.* "$S"/shells/clink/* "$S/VERSION" | tr -cd "\r" | wc -c | tr -d ' ')"
 
 check "staged copy reports the version" "tstamp $(cat "$ROOT/VERSION")" "$(bash "$S/bin/tstamp" version)"
 bash "$S/bin/tstamp" help >/dev/null 2>&1
