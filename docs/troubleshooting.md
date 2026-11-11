@@ -85,6 +85,27 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 Then open a new PowerShell window.
 
+## PowerShell is slow to start, or typed text appears late
+
+Windows PowerShell 5.1 comes with PSReadLine 2.0.0. On one test computer the
+first prompt froze for about ten seconds, with and without tstamp, and the delay
+went away after installing a newer PSReadLine. Check your version:
+
+```powershell
+(Get-Module PSReadLine).Version
+```
+
+If you want a newer one, this installs it for your user only. It may first ask
+to install the NuGet package provider:
+
+```powershell
+Install-Module PSReadLine -Scope CurrentUser -Force
+```
+
+Then open a new PowerShell window. tstamp ignores the old history lines that
+PSReadLine replays at start, but an old PSReadLine can still be slow on some
+computers.
+
 ## Nothing is timed in Command Prompt
 
 That is expected. CMD has no way to run code around each command, so it is only

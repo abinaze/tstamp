@@ -317,6 +317,14 @@ TROUBLESHOOTING
               Run this once in PowerShell, then open a new window:
                  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
+       PowerShell is slow to start
+              Windows PowerShell 5.1 ships PSReadLine 2.0.0. On one test
+              computer a newer PSReadLine removed a ten second delay at
+              the first prompt. Check the version with
+              (Get-Module PSReadLine).Version and, if you like, install
+              a newer one for your user only:
+                 Install-Module PSReadLine -Scope CurrentUser -Force
+
        Nothing is timed in Command Prompt
               That is expected unless the optional Clink add-on is loaded
               in that window. Use "tstamp run COMMAND" to time one
