@@ -108,11 +108,15 @@ computers.
 
 ## Nothing is timed in Command Prompt
 
-That is expected. CMD has no way to run code around each command, so it is only
-tracked in a window where the optional Clink add-on is loaded (see
-[installation](installation.md)). A new Command Prompt window does not have
-Clink unless you set Clink to start with every window. Otherwise use
-`tstamp run COMMAND` to time one command.
+That is expected in the plain window. CMD has no way to run code around each
+command. Type `tstamp` there to start a tracked session, or use
+`tstamp run COMMAND` to time one command. The optional Clink add-on can track the
+real window; see [installation](installation.md).
+
+## A line with an apostrophe waits at `>>` in the tstamp session
+
+A line with an odd number of quote marks, such as `echo it's`, waits for more
+input. Finish the quote, or press Ctrl+C.
 
 ## "tstamp" is not recognized in Command Prompt
 

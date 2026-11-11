@@ -148,7 +148,14 @@ state folder, global flag and tab-separated logs as the bash integration, so
 never reclaims or lists them, because their process IDs mean something else to
 bash. The other commands run through Git Bash.
 
-CMD has no hook that runs around each command, so it is not tracked on its own.
+CMD has no hook that runs around each command, so the window is not tracked on
+its own. Typing `tstamp` in CMD starts `shells/cmdsession.ps1` through
+`bin/tstamp.cmd`: Windows PowerShell with the normal hook, where
+`PSConsoleHostReadLine` is replaced so that each typed line runs in `cmd.exe`
+(`__ts_cmdrun`). After each line, `cmd.exe` writes its exit code, folder and
+environment to temporary files so that `cd` and `set` carry over. The hook's
+`prompt` prints the END line from that exit code.
+
 `bin/tstamp.cmd` and `bin/tstamp-a.cmd` run the normal commands
 through Git Bash, and `tstamp run COMMAND` (`lib/run.sh`) times one command, from
 any shell. Started from CMD, it runs the command through `cmd.exe` so built-ins

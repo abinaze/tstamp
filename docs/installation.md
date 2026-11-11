@@ -19,8 +19,8 @@ https://git-scm.com/download/win. The tstamp installer tells you if it is missin
    of your PowerShell profile first. The last box adds tstamp to your user PATH
    only.
 5. Open a new Git Bash or PowerShell window and type `tstamp-a`. In Command
-   Prompt, time one command at a time with `tstamp run COMMAND`, or follow
-   the optional Clink steps below to track every command.
+   Prompt, type `tstamp` to start a tracked session (see below), or time one
+   command at a time with `tstamp run COMMAND`.
 
 If PowerShell says that running scripts is disabled, run this once in PowerShell:
 
@@ -31,12 +31,39 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 **Uninstall:** Windows Settings, then Apps, find tstamp, then Uninstall. It asks
 whether to also delete your saved logs. The default answer is No.
 
+### Command Prompt: the tstamp session (experimental)
+
+Type `tstamp` in Command Prompt. It starts a tracked session in the same window.
+Each line you type is run by `cmd.exe` and gets START and END lines, an exit
+code and a duration, in the same logs as the other shells. Type `exit` to go
+back to your normal prompt.
+
+It uses only Windows PowerShell 5.1 and `cmd.exe`, which Windows already has.
+It installs nothing and changes no setting or registry entry, and it lasts only
+as long as the session.
+
+Inside it, `tstamp stop`, `tstamp-a stop` and `tstamp 2` work as in the other
+shells, `cd` and `set` carry over from line to line, and Ctrl+C stops the running
+command and keeps the session.
+
+Good to know:
+
+- It is a separate session, not your original window. Changes made with `cd` and
+  `set` do not carry back out when you type `exit`.
+- Each command carries about 0.1 second of overhead for starting `cmd.exe`, and
+  the first one about half a second.
+- Tab completes the PowerShell way, and the colours are PowerShell's.
+- A line with an odd number of quote marks, such as `echo it's`, waits for more
+  input. Finish the quote, or press Ctrl+C.
+- `doskey` macros and the `pushd` stack are not kept between lines.
+
 ### Command Prompt with Clink (optional)
 
-Command Prompt cannot run code around each command, so tstamp cannot track it
-on its own. [Clink](https://github.com/chrisant996/clink) is a free,
-third-party add-on that attaches to Command Prompt, and tstamp ships a script
-for it. This is optional, and tstamp works without it.
+The session above is separate from your normal window. To track the real Command
+Prompt window itself, something has to attach to it, because Command Prompt
+cannot run code around each command. [Clink](https://github.com/chrisant996/clink)
+is a free, third-party add-on that does that, and tstamp ships a script for it.
+This is optional, and tstamp works without it.
 
 It was tried by hand with Clink 1.9.36 on Windows 11. CI tests the script's
 logic with a fake Clink, not the real one. Only Command Prompt windows where

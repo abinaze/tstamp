@@ -98,7 +98,7 @@ Build failed.
         <li><h3>Download and open the installer</h3><p>No administrator rights needed. If Windows says &ldquo;unknown publisher&rdquo; (the installer is not code-signed), choose <strong>More info</strong>, then <strong>Run anyway</strong>. Keep &ldquo;Load tstamp in every new Git Bash window&rdquo; ticked; your <code>~/.bashrc</code> is backed up first.</p><p><a class="btn" href="https://github.com/abinaze/tstamp/releases/latest/download/tstamp-windows-setup.exe">Download tstamp-windows-setup.exe</a></p></li>
         <li><h3>Turn it on</h3><p>Open a new Git Bash or PowerShell window and run:</p><div class="cmd"><pre><code id="cmd-win">tstamp-a</code></pre><button class="copy" type="button" data-copy="cmd-win">Copy</button></div></li>
       </ol>
-      <p class="small">Command Prompt is not tracked on its own; there, time one command with <code>tstamp run COMMAND</code>, or use the optional Clink add-on. If PowerShell says scripts are disabled, run <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code> once.</p>
+      <p class="small">In Command Prompt, type <code>tstamp</code> to start a tracked session (experimental), or time one command with <code>tstamp run COMMAND</code>. If PowerShell says scripts are disabled, run <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code> once.</p>
       <p class="small">Uninstall: Windows Settings, then Apps, then tstamp.</p>
     </div>
 
@@ -162,7 +162,7 @@ Build failed.
         <tr><td>Restart behaviour</td><td>Partly tested. A real restart has not been tested yet.</td></tr>
         <tr><td>WSL, Windows Terminal, IDE terminals</td><td>Not tested yet</td></tr>
         <tr><td>zsh (macOS default), fish</td><td>Not supported yet</td></tr>
-        <tr><td>PowerShell, CMD</td><td>PowerShell 5.1 is tracked automatically (tested in CI and by hand). CMD is not tracked on its own; <code>tstamp run COMMAND</code> times one command, and the optional Clink add-on tracks every command (tried by hand). PowerShell 7 is not tested yet.</td></tr>
+        <tr><td>PowerShell, CMD</td><td>PowerShell 5.1 is tracked automatically (tested in CI and by hand). The CMD window is not tracked on its own; typing <code>tstamp</code> there starts a tracked session (experimental), <code>tstamp run COMMAND</code> times one command, and the optional Clink add-on tracks the real window. PowerShell 7 is not tested yet.</td></tr>
       </tbody>
     </table></div>
   </div>

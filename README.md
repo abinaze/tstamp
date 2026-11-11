@@ -114,7 +114,7 @@ Every command is explained in [Commands](docs/commands.md).
 | Ubuntu (bash) | Tested in CI, including the `.deb` |
 | macOS (bash 5) | Tested in CI |
 | Windows PowerShell 5.1 | Tested in CI and by hand |
-| CMD | Not tracked on its own; `tstamp run COMMAND` times one command. With the optional Clink add-on, every command is tracked (tried by hand, not tested in CI) |
+| CMD | The window is not tracked on its own. Typing `tstamp` starts a tracked session that runs each line in cmd.exe (experimental, installs nothing). `tstamp run COMMAND` times one command. The optional Clink add-on tracks the real window |
 | zsh, fish | Not supported yet |
 | WSL, Windows Terminal, IDE terminals | Not tested yet |
 

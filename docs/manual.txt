@@ -83,8 +83,16 @@ COMMANDS
               Run one command with START and END lines, its exit code and
               its duration, written to the same log as your other windows.
               It works in every shell, including Command Prompt (CMD),
-              which cannot be tracked automatically. It returns the exit
-              code of the command.
+              which is not tracked on its own. It returns the exit code
+              of the command.
+
+       tstamp   (in Command Prompt, with no arguments)
+              Start a tracked session in the same window. Each line you
+              type is run by cmd.exe, with START and END lines, its exit
+              code and its duration. Type "exit" to go back. It installs
+              nothing and changes no setting. Experimental. A line with
+              an odd number of quote marks waits for more input, and each
+              command carries about 0.1 second of overhead.
 
    Time style
        tstamp format
@@ -208,11 +216,12 @@ SHELL COMPATIBILITY
                                         and END lines, exit codes, shared
                                         logs and the profile hook.
        PowerShell 7                     Not tested yet.
-       Command Prompt (CMD)             Not tracked on its own: CMD has no
-                                        hook. "tstamp run" works. With the
-                                        optional Clink add-on, tried by
-                                        hand with Clink 1.9, every command
-                                        is tracked.
+       Command Prompt (CMD)             The window is not tracked on its
+                                        own: CMD has no hook. "tstamp"
+                                        starts a tracked session (tried by
+                                        hand, experimental). "tstamp run"
+                                        works. The optional Clink add-on
+                                        tracks the real window.
        Ubuntu, bash                     Tested in CI, including the .deb.
        macOS, bash 5 (Homebrew)         Tested in CI. The built-in bash
                                         3.2 is too old.
@@ -229,7 +238,7 @@ LIMITATIONS
        Not yet tested: full-screen programs (vim, less, ssh), several
        commands on one line, background jobs and very long-running
        commands. Supported: bash and Windows PowerShell 5.1. Command Prompt
-       is tracked only with the optional Clink add-on.
+       is tracked by the "tstamp" session or the optional Clink add-on.
 
 PRIVACY
        tstamp never connects to the internet. It saves a log of your
@@ -326,10 +335,16 @@ TROUBLESHOOTING
                  Install-Module PSReadLine -Scope CurrentUser -Force
 
        Nothing is timed in Command Prompt
-              That is expected unless the optional Clink add-on is loaded
-              in that window. Use "tstamp run COMMAND" to time one
-              command. See "Command Prompt with Clink" in installation.md
-              in the project's docs folder on GitHub.
+              That is expected in the plain window. Type "tstamp" there
+              to start a tracked session, or use "tstamp run COMMAND" to
+              time one command. The optional Clink add-on can track the
+              real window; see installation.md in the project's docs
+              folder on GitHub.
+
+       A line with an apostrophe waits at ">>" in the tstamp session
+              A line with an odd number of quote marks, such as
+              echo it's, waits for more input. Finish the quote, or press
+              Ctrl+C.
 
        Tracking is off after a restart
               This is intended. Type tstamp-a again.

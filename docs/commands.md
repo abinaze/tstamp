@@ -87,6 +87,13 @@ both `~/.bash_profile` and `~/.bashrc`) so new windows load tstamp. With
 backup, and never touches other lines. `hook remove` takes the block out again.
 Add `--yes` to skip the question. The installers run these for you.
 
+## tstamp in Command Prompt
+
+Typing `tstamp` with no arguments in Command Prompt starts a tracked session in
+the same window (experimental). Each line you type is run by `cmd.exe`, with
+START and END lines, an exit code and a duration. Type `exit` to go back. It
+installs nothing. See [installation](installation.md) for what to know.
+
 ## tstamp run
 
 Runs one command and prints a START and an END line around it, with the exit code

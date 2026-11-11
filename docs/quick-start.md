@@ -57,8 +57,9 @@ tstamp-a stop    # every window
 - tstamp does not time the `tstamp` commands themselves.
 - Tracking switches itself off when the computer restarts. Type `tstamp-a` again.
 - To turn it on in just one window, type `tstamp` instead of `tstamp-a`.
-- On Windows you can use Git Bash or PowerShell. In Command Prompt, time one
-  command at a time with `tstamp run COMMAND`, or use the optional Clink add-on.
+- On Windows you can use Git Bash or PowerShell. In Command Prompt, type
+  `tstamp` to start a tracked session, or time one command at a time with
+  `tstamp run COMMAND`.
 - Change the time style with `tstamp set 2`. See [timestamp formats](timestamp-formats.md).
 
 Something not working? See [troubleshooting](troubleshooting.md).
