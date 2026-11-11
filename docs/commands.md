@@ -98,7 +98,7 @@ tstamp run npm run build
 ```
 
 It works in every shell, and it is the way to time commands in Command Prompt,
-which cannot be tracked automatically. In Command Prompt it uses CMD's own
+which is not tracked on its own. In Command Prompt it uses CMD's own
 commands, so `tstamp run dir` and `tstamp run ver` work.
 
 ## Where tstamp keeps things

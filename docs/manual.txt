@@ -208,10 +208,11 @@ SHELL COMPATIBILITY
                                         and END lines, exit codes, shared
                                         logs and the profile hook.
        PowerShell 7                     Not tested yet.
-       Command Prompt (CMD)             Cannot be tracked automatically,
-                                        because CMD has no hook. The
-                                        tstamp commands and "tstamp run"
-                                        work there and are tested.
+       Command Prompt (CMD)             Not tracked on its own: CMD has no
+                                        hook. "tstamp run" works. With the
+                                        optional Clink add-on, tried by
+                                        hand with Clink 1.9, every command
+                                        is tracked.
        Ubuntu, bash                     Tested in CI, including the .deb.
        macOS, bash 5 (Homebrew)         Tested in CI. The built-in bash
                                         3.2 is too old.
@@ -228,7 +229,7 @@ LIMITATIONS
        Not yet tested: full-screen programs (vim, less, ssh), several
        commands on one line, background jobs and very long-running
        commands. Supported: bash and Windows PowerShell 5.1. Command Prompt
-       cannot be tracked automatically.
+       is tracked only with the optional Clink add-on.
 
 PRIVACY
        tstamp never connects to the internet. It saves a log of your
@@ -317,7 +318,10 @@ TROUBLESHOOTING
                  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
        Nothing is timed in Command Prompt
-              That is expected. Use "tstamp run COMMAND" to time one command.
+              That is expected unless the optional Clink add-on is loaded
+              in that window. Use "tstamp run COMMAND" to time one
+              command. See "Command Prompt with Clink" in installation.md
+              in the project's docs folder on GitHub.
 
        Tracking is off after a restart
               This is intended. Type tstamp-a again.

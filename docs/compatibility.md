@@ -14,7 +14,7 @@ that.
 | Windows Terminal, VS Code or other terminals running bash | Not tested yet. |
 | Windows PowerShell 5.1 | Tested. START and END lines, exit codes, shared logs and the profile hook are tested in CI and were tried by hand on Windows 11. |
 | PowerShell 7 | Not tested yet. |
-| Command Prompt (CMD) | **Cannot be tracked automatically**, because CMD has no way to run code around each command. The `tstamp` commands and `tstamp run COMMAND` work there and are tested. |
+| Command Prompt (CMD) | **Not tracked on its own**, because CMD has no way to run code around each command. The `tstamp` commands and `tstamp run COMMAND` work there and are tested. With the optional [Clink](https://github.com/chrisant996/clink) add-on, every command is tracked; this was tried by hand with Clink 1.9 on Windows 11, and its logic is tested in CI with a fake Clink. See [installation](installation.md). |
 | zsh (the Mac default), fish | Not supported yet. |
 
 ## What "tested" means

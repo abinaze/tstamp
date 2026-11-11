@@ -119,7 +119,7 @@ based only on what these tests, locally or in CI, have shown.
 
 ## Known limits
 
-- Supported: bash 4.4 or newer and Windows PowerShell 5.1. CMD cannot be tracked automatically.
+- Supported: bash 4.4 or newer and Windows PowerShell 5.1. CMD is tracked only with the optional Clink add-on.
 - A pipeline is recorded as one command.
 - Full-screen programs, background jobs and several commands on one line
   are not tested yet.
@@ -148,8 +148,8 @@ state folder, global flag and tab-separated logs as the bash integration, so
 never reclaims or lists them, because their process IDs mean something else to
 bash. The other commands run through Git Bash.
 
-CMD has no hook that runs around each command, so it cannot be tracked
-automatically. `bin/tstamp.cmd` and `bin/tstamp-a.cmd` run the normal commands
+CMD has no hook that runs around each command, so it is not tracked on its own.
+`bin/tstamp.cmd` and `bin/tstamp-a.cmd` run the normal commands
 through Git Bash, and `tstamp run COMMAND` (`lib/run.sh`) times one command, from
 any shell. Started from CMD, it runs the command through `cmd.exe` so built-ins
 like `dir` work.

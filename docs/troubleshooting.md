@@ -87,8 +87,11 @@ Then open a new PowerShell window.
 
 ## Nothing is timed in Command Prompt
 
-That is expected. CMD has no way to run code around each command, so it cannot
-be tracked automatically. Use `tstamp run COMMAND` to time one command.
+That is expected. CMD has no way to run code around each command, so it is only
+tracked in a window where the optional Clink add-on is loaded (see
+[installation](installation.md)). A new Command Prompt window does not have
+Clink unless you set Clink to start with every window. Otherwise use
+`tstamp run COMMAND` to time one command.
 
 ## "tstamp" is not recognized in Command Prompt
 
