@@ -63,7 +63,9 @@ function global:__ts_cmdrun {
       if ((-not $pre.ContainsKey($k)) -or ($pre[$k] -ne $post[$k])) { [Environment]::SetEnvironmentVariable($k, $post[$k], 'Process') }
     }
     foreach ($k in @($pre.Keys)) {
-      if (-not $post.ContainsKey($k)) { [Environment]::SetEnvironmentVariable($k, $null, 'Process') }
+      # Remove-Item works the same in Windows PowerShell and PowerShell 7. Passing $null
+      # to SetEnvironmentVariable would leave an empty variable behind in PowerShell 7.
+      if (-not $post.ContainsKey($k)) { Remove-Item -LiteralPath ('Env:' + $k) -ErrorAction SilentlyContinue }
     }
   }
   Remove-Item -LiteralPath $fRc, $fCwd, $fEnv -ErrorAction SilentlyContinue
