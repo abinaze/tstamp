@@ -23,6 +23,7 @@ has   "is skipped while the repository is private" 'github.event.repository.priv
 has   "may write Pages" 'pages: write'
 has   "may request the Pages token" 'id-token: write'
 has   "uses the Pages deploy action" 'actions/deploy-pages@'
+has   "waits for the artifact to be listed before deploying" 'run: sleep 15'
 has   "never overlaps with itself" 'cancel-in-progress: false'
 hasnt "avoids pull_request_target" 'pull_request_target'
 hasnt "does not run on pull requests" 'pull_request:'

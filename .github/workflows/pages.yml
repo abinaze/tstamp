@@ -45,6 +45,12 @@ jobs:
         with:
           path: site
 
+      # GitHub sometimes does not list the new artifact for a moment, and the
+      # deploy step then fails with "No artifacts named github-pages". A short
+      # pause avoids that.
+      - name: Wait until GitHub lists the artifact
+        run: sleep 15
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
