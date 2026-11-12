@@ -47,6 +47,7 @@ jobs:
           uname -srm
           date +"%Y-%m-%d %H:%M:%S" || true
           date +"%3N" || true
+          if command -v pwsh >/dev/null 2>&1; then echo "pwsh: $(pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()')"; else echo "pwsh: not installed"; fi
 
       - name: Run the tests
         shell: bash
