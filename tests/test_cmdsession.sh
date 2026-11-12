@@ -31,11 +31,11 @@ if [ "$crlf" -gt 20 ]; then pass=$((pass + 1)); echo "ok   - tstamp.cmd keeps Wi
 
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
-    if command -v powershell >/dev/null 2>&1; then
+    if command -v "${TSTAMP_TEST_POWERSHELL:-powershell}" >/dev/null 2>&1; then
       TMP="$(mktemp -d)"
       trap 'rm -rf "$TMP"' EXIT
       W() { cygpath -w "$1"; }
-      out="$(cd "$ROOT" && powershell -NoProfile -ExecutionPolicy Bypass -File "$(W "$ROOT/tests/ps/cmdrun.ps1")" "$(W "$TMP/state")" "$(W "$S")" 2>&1 | tr -d '\r')"
+      out="$(cd "$ROOT" && "${TSTAMP_TEST_POWERSHELL:-powershell}" -NoProfile -ExecutionPolicy Bypass -File "$(W "$ROOT/tests/ps/cmdrun.ps1")" "$(W "$TMP/state")" "$(W "$S")" 2>&1 | tr -d '\r')"
       hasout "session: tracking is on in the session"        'Tracking enabled in this terminal' "$out"
       hasout "session: cd carries over"                      '^CWD_CHANGED=True$' "$out"
       hasout "session: set carries over, with no trailing space" '^ENV=\[hello world\]$' "$out"

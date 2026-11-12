@@ -9,7 +9,7 @@ case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*) ;;
   *) echo "skip - PowerShell tests run on Windows only"; echo; echo "passed=0 failed=0 skipped=1"; exit 0 ;;
 esac
-if ! command -v powershell >/dev/null 2>&1; then
+if ! command -v "${TSTAMP_TEST_POWERSHELL:-powershell}" >/dev/null 2>&1; then
   echo "skip - powershell.exe not found"; echo; echo "passed=0 failed=0 skipped=1"; exit 0
 fi
 
@@ -28,7 +28,7 @@ has() { # description, regex, text
 W() { cygpath -w "$1"; }
 PS1="$(W "$ROOT/shells/powershell.ps1")"
 SIM="$(W "$ROOT/tests/ps/simulate.ps1")"
-PSH=(powershell -NoProfile -ExecutionPolicy Bypass -File)
+PSH=("${TSTAMP_TEST_POWERSHELL:-powershell}" -NoProfile -ExecutionPolicy Bypass -File)
 
 # --- time formats: PowerShell must print exactly what bash prints ---
 US=1700000000123456

@@ -8,7 +8,7 @@ case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*) ;;
   *) echo "skip - PowerShell tests run on Windows only"; echo; echo "passed=0 failed=0 skipped=1"; exit 0 ;;
 esac
-if ! command -v powershell >/dev/null 2>&1; then
+if ! command -v "${TSTAMP_TEST_POWERSHELL:-powershell}" >/dev/null 2>&1; then
   echo "skip - powershell.exe not found"; echo; echo "passed=0 failed=0 skipped=1"; exit 0
 fi
 
@@ -24,7 +24,7 @@ hasnt() { # description, regex, text
 }
 
 W() { cygpath -w "$1"; }
-out="$(powershell -NoProfile -ExecutionPolicy Bypass -File "$(W "$ROOT/tests/ps/scope.ps1")" "$(W "$TMP/state")" "$(W "$ROOT/shells/powershell.ps1")" 2>&1 | tr -d '\r')"
+out="$("${TSTAMP_TEST_POWERSHELL:-powershell}" -NoProfile -ExecutionPolicy Bypass -File "$(W "$ROOT/tests/ps/scope.ps1")" "$(W "$TMP/state")" "$(W "$ROOT/shells/powershell.ps1")" 2>&1 | tr -d '\r')"
 
 has   "tstamp-a turns tracking on"                  'Global tracking enabled\.' "$out"
 has   "global: tracked"                             'START: echo g1$' "$out"
