@@ -215,7 +215,9 @@ SHELL COMPATIBILITY
        Windows PowerShell 5.1           Tested in CI and by hand: START
                                         and END lines, exit codes, shared
                                         logs and the profile hook.
-       PowerShell 7                     Not tested yet.
+       PowerShell 7                     Tested by hand with 7.7 and in
+                                        CI: START and END lines, exit
+                                        codes and the stop rules.
        Command Prompt (CMD)             The window is not tracked on its
                                         own: CMD has no hook. "tstamp"
                                         starts a tracked session (tried by
@@ -237,8 +239,9 @@ SHELL COMPATIBILITY
 LIMITATIONS
        Not yet tested: full-screen programs (vim, less, ssh), several
        commands on one line, background jobs and very long-running
-       commands. Supported: bash and Windows PowerShell 5.1. Command Prompt
-       is tracked by the "tstamp" session or the optional Clink add-on.
+       commands. Supported: bash, Windows PowerShell 5.1 and PowerShell 7.
+       Command Prompt is tracked by the "tstamp" session or the optional
+       Clink add-on.
 
 PRIVACY
        tstamp never connects to the internet. It saves a log of your

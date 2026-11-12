@@ -13,7 +13,7 @@ that.
 | WSL, other Linux | Not tested yet. |
 | Windows Terminal, VS Code or other terminals running bash | Not tested yet. |
 | Windows PowerShell 5.1 | Tested. START and END lines, exit codes, shared logs and the profile hook are tested in CI and were tried by hand on Windows 11. |
-| PowerShell 7 | Not tested yet. |
+| PowerShell 7 | Tested. START and END lines, exit codes and the stop rules were tried by hand with PowerShell 7.7 on Windows 11, and the PowerShell tests also run on PowerShell 7 in CI. |
 | Command Prompt (CMD) | **The window is not tracked on its own**, because CMD has no way to run code around each command. Typing `tstamp` there starts a tracked session in the same window that runs each line in `cmd.exe`; it is experimental, tried by hand on Windows 11 with Windows PowerShell 5.1, and tested in CI on Windows. `tstamp run COMMAND` times one command. With the optional [Clink](https://github.com/chrisant996/clink) add-on the real window is tracked; this was tried by hand with Clink 1.9, and its logic is tested in CI with a fake Clink. See [installation](installation.md). |
 | zsh (the Mac default), fish | Not supported yet. |
 

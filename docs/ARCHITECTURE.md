@@ -119,7 +119,7 @@ based only on what these tests, locally or in CI, have shown.
 
 ## Known limits
 
-- Supported: bash 4.4 or newer and Windows PowerShell 5.1. CMD is tracked only with the optional Clink add-on.
+- Supported: bash 4.4 or newer, Windows PowerShell 5.1 and PowerShell 7. CMD is tracked only with the optional Clink add-on.
 - A pipeline is recorded as one command.
 - Full-screen programs, background jobs and several commands on one line
   are not tested yet.
@@ -139,7 +139,7 @@ used by the README and the website keep working.
 
 ## PowerShell, CMD and `run`
 
-`shells/powershell.ps1` tracks commands in Windows PowerShell 5.1. It uses
+`shells/powershell.ps1` tracks commands in Windows PowerShell 5.1 and PowerShell 7. It uses
 PSReadLine's `AddToHistoryHandler` to print the START line when a line is
 submitted, and a wrapper around `prompt` to print the END line, taking the
 exit code from `$?`, `$LASTEXITCODE` and the error list. It writes the same
