@@ -7,3 +7,5 @@ docs/*.txt text eol=lf
 *.cmd text eol=crlf
 *.ps1 text eol=lf
 *.lua text eol=lf
+*.bmp binary
+*.ico binary
