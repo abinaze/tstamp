@@ -7,6 +7,8 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-14
+
 ### Added
 
 - In Command Prompt, `tstamp-a` now also starts the tracked session in that
@@ -15,11 +17,14 @@ and the project follows [Semantic Versioning](https://semver.org/).
   new Command Prompt windows open as a tracked session while global tracking is
   on. It adds one command to your user's `AutoRun` value, keeps the old value,
   and uninstalling removes only that command.
-
 - PowerShell 7 is tested: by hand with 7.7, and the PowerShell tests also run on
-  PowerShell 7 in CI. The Command Prompt session script now also works when it
-  runs under PowerShell 7 (removing a variable with `set VAR=` left an empty
-  one behind there).
+  PowerShell 7 in CI.
+
+### Fixed
+
+- The Command Prompt session script now also works when it runs under
+  PowerShell 7 (removing a variable with `set VAR=` left an empty one behind
+  there).
 
 ## [0.1.0] - 2026-11-11
 
