@@ -21,9 +21,13 @@ exit /b %ERRORLEVEL%
 echo tstamp: Git Bash was not found. Install Git for Windows: https://git-scm.com/download/win 1>&2
 exit /b 1
 :session
+if defined TSTAMP_CMD_SESSION goto insession
 if not exist "%~dp0..\shells\cmdsession.ps1" goto nosession
 powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -NoExit -File "%~dp0..\shells\cmdsession.ps1" %2
 exit /b %ERRORLEVEL%
 :nosession
 echo tstamp: the session script was not found. 1>&2
 exit /b 1
+:insession
+echo tstamp: this window is already a TStamp session.
+exit /b 0

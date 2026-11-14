@@ -3,7 +3,10 @@
 # Windows PowerShell 5.1 with the TStamp hook loaded, but every line you type is
 # run by cmd.exe instead of PowerShell. Type exit to go back to Command Prompt.
 # It changes nothing on the computer: no registry entry, no setting, no install.
-param([string]$Format = '')
+param([string]$Format = '', [switch]$Auto)
+
+# Lets bin\tstamp.cmd and the AutoRun script tell that this window is already a session.
+$env:TSTAMP_CMD_SESSION = '1'
 
 # The prompt looks like Command Prompt's. It is defined first so that the hook
 # wraps it, and the hook then prints the END line before each prompt.
@@ -15,6 +18,17 @@ if (-not $global:__TS) {
   exit 1
 }
 $global:__TS.CmdExit = $null
+
+# -Auto: started by bin\tstamp-autorun.cmd when a Command Prompt window opens.
+# It only continues while global tracking is on for this boot. A flag left over
+# from before a reboot is removed, so later windows do not start PowerShell for nothing.
+if ($Auto) {
+  if (-not (__ts_global_on)) {
+    $stale = Join-Path $global:__TS.Home 'enabled'
+    if (Test-Path -LiteralPath $stale) { Remove-Item -LiteralPath $stale -ErrorAction SilentlyContinue }
+    exit 2
+  }
+}
 
 # Runs one line in cmd.exe. After the line, cmd.exe writes the exit code, the
 # current folder and its environment to temporary files, so that cd and set
@@ -87,6 +101,10 @@ function global:PSConsoleHostReadLine {
   "__ts_cmdrun '" + $t.Replace("'", "''") + "'"
 }
 
-Write-Host 'TStamp session for Command Prompt commands (experimental).'
-Write-Host 'Lines you type are run by cmd.exe. Type exit to go back.'
+if ($Auto) {
+  Write-Host 'TStamp is tracking this window (global tracking is on). Type exit to close it.'
+} else {
+  Write-Host 'TStamp session for Command Prompt commands (experimental).'
+  Write-Host 'Lines you type are run by cmd.exe. Type exit to go back.'
+}
 tstamp $Format
