@@ -14,13 +14,14 @@ https://git-scm.com/download/win. The tstamp installer tells you if it is missin
 2. Open the file. You do not need administrator rights.
 3. Windows may say "unknown publisher", because the installer is not
    code-signed. Choose **More info**, then **Run anyway**.
-4. Keep the three boxes ticked: **Git Bash**, **PowerShell**, and **CMD and
-   PowerShell commands**. The installer saves a backup of your `~/.bashrc` and
-   of your PowerShell profile first. The last box adds tstamp to your user PATH
-   only.
-5. Open a new Git Bash or PowerShell window and type `tstamp-a`. In Command
-   Prompt, type `tstamp` to start a tracked session (see below), or time one
-   command at a time with `tstamp run COMMAND`.
+4. Keep the first three boxes ticked: **Git Bash**, **PowerShell**, and **CMD
+   and PowerShell commands**. The installer saves a backup of your `~/.bashrc`
+   and of your PowerShell profile first. The third box adds tstamp to your user
+   PATH only. A fourth box, **Command Prompt**, is not ticked: see
+   "Command Prompt: start automatically" below.
+5. Open a new Git Bash, PowerShell or Command Prompt window and type
+   `tstamp-a`. In Command Prompt this also turns that window into a tracked
+   session (see below). To time one command only, use `tstamp run COMMAND`.
 
 If PowerShell says that running scripts is disabled, run this once in PowerShell:
 
@@ -33,7 +34,8 @@ whether to also delete your saved logs. The default answer is No.
 
 ### Command Prompt: the tstamp session (experimental)
 
-Type `tstamp` in Command Prompt. It starts a tracked session in the same window.
+Type `tstamp-a` (all windows, and this one) or `tstamp` (this window only) in
+Command Prompt. It starts a tracked session in the same window.
 Each line you type is run by `cmd.exe` and gets START and END lines, an exit
 code and a duration, in the same logs as the other shells. Type `exit` to go
 back to your normal prompt.
@@ -56,6 +58,24 @@ Good to know:
 - A line with an odd number of quote marks, such as `echo it's`, waits for more
   input. Finish the quote, or press Ctrl+C.
 - `doskey` macros and the `pushd` stack are not kept between lines.
+
+### Command Prompt: start automatically (optional)
+
+Command Prompt has no hook, so a window can only be tracked if something starts
+the session for it. If you tick the **Command Prompt** box in the installer
+(it is not ticked by default), Windows runs `tstamp-autorun.cmd` each time a
+Command Prompt window opens. While global tracking is on (`tstamp-a`), the window
+then opens straight into the session, and typing `exit` closes it. Windows that
+are started by scripts or other programs (`cmd /c ...`) are left alone, and so
+is every window while global tracking is off or after a restart.
+
+This is the only part of tstamp that writes a Windows setting: your user's
+`AutoRun` value under `HKEY_CURRENT_USER\Software\Microsoft\Command Processor`.
+It is added after any value that is already there, the old value is also saved
+under `HKEY_CURRENT_USER\Software\TStamp`, and uninstalling removes only
+tstamp's part. To skip it for one window, run `set TSTAMP_NO_AUTORUN=1` before
+opening that window from a script, or use `cmd /d`. It costs about half a second
+when a window opens, because the session runs in PowerShell.
 
 ### Command Prompt with Clink (optional)
 

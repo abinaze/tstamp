@@ -9,6 +9,13 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- In Command Prompt, `tstamp-a` now also starts the tracked session in that
+  window, so one command does both. `tstamp-a stop` only stops tracking.
+- An optional installer box (not ticked by default), **Command Prompt**, makes
+  new Command Prompt windows open as a tracked session while global tracking is
+  on. It adds one command to your user's `AutoRun` value, keeps the old value,
+  and uninstalling removes only that command.
+
 - PowerShell 7 is tested: by hand with 7.7, and the PowerShell tests also run on
   PowerShell 7 in CI. The Command Prompt session script now also works when it
   runs under PowerShell 7 (removing a variable with `set VAR=` left an empty

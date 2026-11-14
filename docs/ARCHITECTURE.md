@@ -156,6 +156,16 @@ its own. Typing `tstamp` in CMD starts `shells/cmdsession.ps1` through
 environment to temporary files so that `cd` and `set` carry over. The hook's
 `prompt` prints the END line from that exit code.
 
+`bin/tstamp-a.cmd` turns global tracking on and then starts the same session in
+the window, unless `TSTAMP_CMD_SESSION` is set (the session sets it, so a session
+never starts inside a session). `bin/tstamp-autorun.cmd` is only used when the
+installer's unticked Command Prompt box added it to the user's `AutoRun` value:
+for an interactive window while global tracking is on, it starts the session with
+`-Auto`. In that mode the script exits with code 2 when global tracking is off
+for this boot (and removes a flag left from before a reboot), so the window stays
+a normal Command Prompt; code 0 means the person typed `exit`, and the window
+closes.
+
 `bin/tstamp.cmd` and `bin/tstamp-a.cmd` run the normal commands
 through Git Bash, and `tstamp run COMMAND` (`lib/run.sh`) times one command, from
 any shell. Started from CMD, it runs the command through `cmd.exe` so built-ins

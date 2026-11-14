@@ -94,6 +94,11 @@ the same window (experimental). Each line you type is run by `cmd.exe`, with
 START and END lines, an exit code and a duration. Type `exit` to go back. It
 installs nothing. See [installation](installation.md) for what to know.
 
+Typing `tstamp-a` in Command Prompt does the same and also turns on global
+tracking for the other windows. `tstamp-a stop` only stops tracking. The
+installer's optional **Command Prompt** box can start this session for you in
+every new window; see [installation](installation.md).
+
 ## tstamp run
 
 Runs one command and prints a START and an END line around it, with the exit code
