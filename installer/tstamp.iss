@@ -5,6 +5,8 @@
 #ifndef MyAppVersion
   #define MyAppVersion "0.1.0-dev"
 #endif
+; The numeric part of the version, for the file properties: 0.2.0 gives 0.2.0, 0.2.0-rc1 gives 0.2.0.
+#define MyBaseVersion Copy(MyAppVersion, 1, Pos("-", MyAppVersion + "-") - 1)
 
 [Setup]
 AppId={{7C2D9E41-5B3A-4F68-9E0D-A1B4C6D8E2F3}
@@ -25,19 +27,35 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayName=TStamp
+UninstallDisplayIcon={app}\tstamp.ico
+SetupIconFile=assets\tstamp.ico
+WizardImageFile=assets\wizard-100.bmp,assets\wizard-125.bmp,assets\wizard-150.bmp,assets\wizard-200.bmp
+WizardSmallImageFile=assets\small-100.bmp,assets\small-125.bmp,assets\small-150.bmp,assets\small-200.bmp
+DisableWelcomePage=no
+LicenseFile=..\LICENSE
+AppCopyright=Copyright (c) 2026 Abinaze Binoy
+VersionInfoVersion={#MyBaseVersion}.0
+VersionInfoCompany=abinaze
+VersionInfoProductName=TStamp
+VersionInfoDescription=TStamp Setup
+VersionInfoCopyright=Copyright (c) 2026 Abinaze Binoy
 
 [Messages]
+WelcomeLabel1=Welcome to TStamp
+WelcomeLabel2=TStamp prints a START and an END line around every command in your terminal, with the exit code and how long it took.%n%nIt runs only on your computer: no internet, no account, no background program.%n%nTStamp runs inside Git Bash, which this setup checks for.
+FinishedHeadingLabel=TStamp is installed
 FinishedLabel=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, tstamp-a also turns that window into a tracked session; to time one command only, use: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 FinishedLabelNoIcons=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, tstamp-a also turns that window into a tracked session; to time one command only, use: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 [Tasks]
-Name: "bashhook"; Description: "Load TStamp in every new Git Bash window (edits ~/.bashrc after making a backup)"; GroupDescription: "Terminals:"
-Name: "powershellhook"; Description: "Load TStamp in every new PowerShell window (edits your PowerShell profile after making a backup)"; GroupDescription: "Terminals:"
-Name: "addtopath"; Description: "Use the tstamp, tstamp-a and tstamp run commands in CMD and PowerShell (adds the install folder to your user PATH)"; GroupDescription: "Terminals:"
-Name: "cmdautorun"; Description: "Command Prompt: open new Command Prompt windows as a TStamp session while tracking is on (adds an AutoRun entry for your user, removed on uninstall)"; GroupDescription: "Terminals:"; Flags: unchecked
+Name: "bashhook"; Description: "Git Bash: load TStamp in every new window (edits ~/.bashrc after making a backup)"; GroupDescription: "Terminals:"
+Name: "powershellhook"; Description: "PowerShell: load TStamp in every new window (edits your PowerShell profile after making a backup)"; GroupDescription: "Terminals:"
+Name: "addtopath"; Description: "CMD and PowerShell commands: use tstamp, tstamp-a and tstamp run anywhere (adds the install folder to your user PATH)"; GroupDescription: "Terminals:"
+Name: "cmdautorun"; Description: "Command Prompt: open new windows as a TStamp session while tracking is on (adds an AutoRun entry for your user, removed on uninstall)"; GroupDescription: "Terminals:"; Flags: unchecked
 
 [Files]
 Source: "..\dist\stage\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "assets\tstamp.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Code]
 function GitBashPath: string;

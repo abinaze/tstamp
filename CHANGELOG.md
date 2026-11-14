@@ -20,6 +20,12 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - PowerShell 7 is tested: by hand with 7.7, and the PowerShell tests also run on
   PowerShell 7 in CI.
 
+### Changed
+
+- The Windows installer has a new look: the TStamp logo as its icon, a branded
+  welcome and finish picture, a licence page, and the TStamp icon in
+  Apps and Features.
+
 ### Fixed
 
 - The Command Prompt session script now also works when it runs under

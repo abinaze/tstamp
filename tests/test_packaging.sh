@@ -51,6 +51,20 @@ check "iss: no { } comment contains another brace" 0 "$(grep -cE '^\{[^}]*\{' "$
 has   "iss: PowerShell profile is a task" "$ISS" 'Name: "powershellhook"'
 has   "iss: PATH is a task" "$ISS" 'Name: "addtopath"'
 has   "iss: Command Prompt AutoRun is a task" "$ISS" 'Name: "cmdautorun"'
+has   "iss: uses the TStamp icon" "$ISS" 'SetupIconFile=assets\tstamp.ico'
+has   "iss: the icon is installed for Apps and Features" "$ISS" 'UninstallDisplayIcon={app}\tstamp.ico'
+has   "iss: has a welcome picture" "$ISS" 'WizardImageFile=assets\wizard-100.bmp'
+has   "iss: has a small picture" "$ISS" 'WizardSmallImageFile=assets\small-100.bmp'
+has   "iss: shows the welcome page" "$ISS" 'DisableWelcomePage=no'
+has   "iss: shows the licence" "$ISS" 'LicenseFile=..\LICENSE'
+for a in wizard-100 wizard-125 wizard-150 wizard-200 small-100 small-125 small-150 small-200; do
+  f="$ROOT/installer/assets/$a.bmp"
+  check "installer picture $a.bmp is a bitmap" "BM" "$(head -c 2 "$f" 2>/dev/null)"
+done
+check "installer picture wizard-100.bmp is 164 wide" 164 "$(od -An -tu4 -j18 -N4 "$ROOT/installer/assets/wizard-100.bmp" | tr -d ' ')"
+check "installer picture wizard-100.bmp is 314 high" 314 "$(od -An -tu4 -j22 -N4 "$ROOT/installer/assets/wizard-100.bmp" | tr -d ' ')"
+check "installer picture small-100.bmp is 55 wide" 55 "$(od -An -tu4 -j18 -N4 "$ROOT/installer/assets/small-100.bmp" | tr -d ' ')"
+check "installer icon is an icon file" "0 1 1" "$(od -An -tu2 -N6 "$ROOT/installer/assets/tstamp.ico" | awk '{ print $1, $2, ($3 > 0) }')"
 has   "iss: PowerShell hook uses the tested command" "$ISS" '--powershell --yes"'
 has   "iss: the environment change is broadcast" "$ISS" 'ChangesEnvironment=yes'
 has   "iss: uninstall removes the PATH entry" "$ISS" 'RemoveFromUserPath;'
