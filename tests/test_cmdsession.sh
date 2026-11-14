@@ -26,6 +26,14 @@ has   "the session needs no policy change"               "$B" 'powershell.exe .*
 hasnt "the session script changes no system setting"     "$S" 'Set-ExecutionPolicy|reg add|setx|Set-ItemProperty|New-ItemProperty|HKLM|HKCU'
 hasnt "the launcher changes no system setting"           "$B" 'Set-ExecutionPolicy|reg add|setx|Set-ItemProperty|HKLM|HKCU'
 has   "the hook lets the session report the exit code"   "$ROOT/shells/powershell.ps1" 'CmdExit'
+has   "the session marks itself with TSTAMP_CMD_SESSION"  "$S" "TSTAMP_CMD_SESSION = '1'"
+has   "tstamp.cmd does not start a session in a session"  "$B" 'if defined TSTAMP_CMD_SESSION goto insession'
+BA="$ROOT/bin/tstamp-a.cmd"
+has   "tstamp-a.cmd turns global tracking on first"       "$BA" 'tstamp.cmd" global-on %\*'
+has   "tstamp-a.cmd then starts the session"              "$BA" 'tstamp.cmd" cmd'
+has   "tstamp-a.cmd leaves tstamp-a stop alone"           "$BA" 'if /i "%~1"=="stop" exit /b 0'
+has   "tstamp-a.cmd does not nest sessions"               "$BA" 'if defined TSTAMP_CMD_SESSION exit /b 0'
+hasnt "tstamp-a.cmd changes no system setting"            "$BA" 'Set-ExecutionPolicy|reg add|setx|Set-ItemProperty|HKLM|HKCU'
 crlf="$(grep -c $'\r' "$B")"
 if [ "$crlf" -gt 20 ]; then pass=$((pass + 1)); echo "ok   - tstamp.cmd keeps Windows line endings"; else fail=$((fail + 1)); echo "FAIL - tstamp.cmd lost its Windows line endings"; fi
 

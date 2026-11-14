@@ -37,11 +37,17 @@ check "the exit code reaches CMD" 3 "$?"
 out="$(cmd //c "$BAT run ver" 2>&1 | tr -d '\r')"
 has "from CMD, run uses CMD's own ver command" 'Microsoft Windows' "$out"
 
+# tstamp-a starts a session in a real window. Setting TSTAMP_CMD_SESSION skips it here.
+export TSTAMP_CMD_SESSION=1
 out="$(cmd //c "$BATA 2" 2>&1 | tr -d '\r')"
 has "tstamp-a works from CMD" 'Global tracking enabled\.' "$out"
 check "tstamp-a saved the format" "format=2" "$(grep '^format=' "$TSTAMP_HOME/config" | tr -d '\r')"
 cmd //c "$BATA stop" >/dev/null 2>&1
 check "tstamp-a stop works from CMD" no "$([ -e "$TSTAMP_HOME/enabled" ] && echo yes || echo no)"
+
+out="$(cmd //c "$BAT" 2>&1 | tr -d '\r')"
+has "tstamp inside a session does not start another" 'already a TStamp session' "$out"
+check "tstamp-a.cmd has Windows line endings" 1 "$(head -c 2000 "$ROOT/bin/tstamp-a.cmd" | grep -c $'\r' | awk '$1 > 0 { print 1 }')"
 
 out="$(TSTAMP_BASH='C:\no-such-folder\bash.exe' cmd //c "$BAT version" 2>&1 | tr -d '\r')"
 has "a missing Git Bash gives a clear message" 'Git Bash was not found' "$out"

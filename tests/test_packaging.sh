@@ -50,6 +50,7 @@ has   "iss: stops cleanly when Git Bash is missing" "$ISS" 'Install Git for Wind
 check "iss: no { } comment contains another brace" 0 "$(grep -cE '^\{[^}]*\{' "$ISS" || true)"
 has   "iss: PowerShell profile is a task" "$ISS" 'Name: "powershellhook"'
 has   "iss: PATH is a task" "$ISS" 'Name: "addtopath"'
+has   "iss: Command Prompt AutoRun is a task" "$ISS" 'Name: "cmdautorun"'
 has   "iss: PowerShell hook uses the tested command" "$ISS" '--powershell --yes"'
 has   "iss: the environment change is broadcast" "$ISS" 'ChangesEnvironment=yes'
 has   "iss: uninstall removes the PATH entry" "$ISS" 'RemoveFromUserPath;'

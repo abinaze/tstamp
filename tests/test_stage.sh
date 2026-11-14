@@ -26,7 +26,7 @@ bash "$ROOT/installer/stage.sh" >/dev/null 2>&1
 check "stage.sh can run twice" 0 "$?"
 
 for f in bin/tstamp bin/tstamp-a lib/config.sh lib/format.sh lib/clock.sh lib/state.sh \
-         lib/export.sh lib/profile.sh shells/bash.sh shells/powershell.ps1 shells/cmdsession.ps1 bin/tstamp.cmd bin/tstamp-a.cmd lib/run.sh docs/help.txt docs/manual.txt \
+         lib/export.sh lib/profile.sh shells/bash.sh shells/powershell.ps1 shells/cmdsession.ps1 bin/tstamp.cmd bin/tstamp-a.cmd bin/tstamp-autorun.cmd lib/run.sh docs/help.txt docs/manual.txt \
          docs/examples.txt VERSION README.md shells/clink/tstamp.lua; do
   check "staged $f" yes "$(exists "$S/$f")"
 done
