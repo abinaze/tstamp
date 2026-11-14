@@ -126,7 +126,7 @@ jobs:
         shell: pwsh
         run: |
           $setup = (Get-ChildItem dist\tstamp-windows-setup.exe | Select-Object -First 1).FullName
-          $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/LOG=install.log' -Wait -PassThru
+          $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/LOG=install.log','/TASKS=bashhook,powershellhook,addtopath,cmdautorun' -Wait -PassThru
           Get-Content install.log -ErrorAction SilentlyContinue | Select-Object -Last 25
           if ($p.ExitCode -ne 0) { throw "Installer exited with code $($p.ExitCode)" }
 
@@ -147,6 +147,9 @@ jobs:
           psprofile="$(cygpath -u "$(powershell -NoProfile -Command '$PROFILE' | tr -d '\r')")"
           grep -qF '# >>> tstamp >>>' "$psprofile"
           cmd //c "$(cygpath -w "$app/bin/tstamp.cmd") version"
+          autorun="$(powershell -NoProfile -Command "(Get-ItemProperty 'HKCU:\Software\Microsoft\Command Processor' -ErrorAction SilentlyContinue).AutoRun" | tr -d '\r')"
+          printf '%s\n' "$autorun" | grep -qF 'tstamp-autorun.cmd'
+          test -f "$app/bin/tstamp-autorun.cmd"
           test -f "$app/shells/powershell.ps1"
           pstest="$(powershell -NoProfile -ExecutionPolicy Bypass -Command ". \$PROFILE; (Get-Command tstamp-a -ErrorAction Stop).CommandType" 2>&1 | tail -n 1 | tr -d '\r')"
           echo "tstamp-a after loading the PowerShell profile is a: $pstest"
@@ -174,6 +177,8 @@ jobs:
           n="$(grep -cF '# >>> tstamp >>>' "$psprofile" || true)"
           echo "PowerShell profile blocks left: $n"
           [ "$n" = 0 ]
+          autorun="$(powershell -NoProfile -Command "(Get-ItemProperty 'HKCU:\Software\Microsoft\Command Processor' -ErrorAction SilentlyContinue).AutoRun" | tr -d '\r')"
+          if printf '%s\n' "$autorun" | grep -qF 'tstamp-autorun.cmd'; then echo "AutoRun entry still present"; exit 1; fi
 
       - name: Attach the installer to the draft release
         if: github.ref_type == 'tag'

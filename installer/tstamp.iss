@@ -27,13 +27,14 @@ WizardStyle=modern
 UninstallDisplayName=TStamp
 
 [Messages]
-FinishedLabel=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, time one command at a time with: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-FinishedLabelNoIcons=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, time one command at a time with: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+FinishedLabel=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, tstamp-a also turns that window into a tracked session; to time one command only, use: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+FinishedLabelNoIcons=Setup has installed [name] on your computer.%n%nOpen a new Git Bash, PowerShell or Command Prompt window, then type tstamp-a. Git Bash and PowerShell windows are timed automatically. In Command Prompt, tstamp-a also turns that window into a tracked session; to time one command only, use: tstamp run COMMAND%n%nIf PowerShell says scripts are disabled, run this once in PowerShell:%nSet-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 [Tasks]
 Name: "bashhook"; Description: "Load TStamp in every new Git Bash window (edits ~/.bashrc after making a backup)"; GroupDescription: "Terminals:"
 Name: "powershellhook"; Description: "Load TStamp in every new PowerShell window (edits your PowerShell profile after making a backup)"; GroupDescription: "Terminals:"
 Name: "addtopath"; Description: "Use the tstamp, tstamp-a and tstamp run commands in CMD and PowerShell (adds the install folder to your user PATH)"; GroupDescription: "Terminals:"
+Name: "cmdautorun"; Description: "Command Prompt: open new Command Prompt windows as a TStamp session while tracking is on (adds an AutoRun entry for your user, removed on uninstall)"; GroupDescription: "Terminals:"; Flags: unchecked
 
 [Files]
 Source: "..\dist\stage\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
@@ -140,6 +141,63 @@ begin
     RegWriteExpandStringValue(HKCU, 'Environment', 'Path', q);
 end;
 
+const
+  AutoRunKey = 'Software\Microsoft\Command Processor';
+  TStampKey = 'Software\TStamp';
+
+// The command added to the Command Prompt AutoRun value. It does nothing if the file is gone.
+function AutoRunCommand: string;
+var
+  f: string;
+begin
+  f := ExpandConstant('{app}\bin\tstamp-autorun.cmd');
+  Result := 'if exist "' + f + '" call "' + f + '"';
+end;
+
+// Adds the AutoRun command after any value that is already there (no administrator rights needed).
+procedure AddCmdAutoRun;
+var
+  p, c: string;
+begin
+  c := AutoRunCommand;
+  if not RegQueryStringValue(HKCU, AutoRunKey, 'AutoRun', p) then
+    p := '';
+  if Pos(Lowercase(c), Lowercase(p)) > 0 then
+    Exit;
+  if p <> '' then
+  begin
+    RegWriteStringValue(HKCU, TStampKey, 'AutoRunBefore', p);
+    p := p + ' & ' + c;
+  end
+  else
+    p := c;
+  RegWriteExpandStringValue(HKCU, AutoRunKey, 'AutoRun', p);
+end;
+
+// Removes only the command that AddCmdAutoRun wrote and leaves the rest of the value as it was.
+procedure RemoveCmdAutoRun;
+var
+  p, q, c: string;
+begin
+  c := AutoRunCommand;
+  if RegQueryStringValue(HKCU, AutoRunKey, 'AutoRun', p) then
+  begin
+    q := p;
+    StringChangeEx(q, ' & ' + c, '', True);
+    StringChangeEx(q, c + ' & ', '', True);
+    StringChangeEx(q, c, '', True);
+    q := Trim(q);
+    if q <> p then
+    begin
+      if q = '' then
+        RegDeleteValue(HKCU, AutoRunKey, 'AutoRun')
+      else
+        RegWriteExpandStringValue(HKCU, AutoRunKey, 'AutoRun', q);
+    end;
+  end;
+  RegDeleteKeyIncludingSubkeys(HKCU, TStampKey);
+end;
+
 function InitializeSetup: Boolean;
 begin
   Result := True;
@@ -170,6 +228,8 @@ begin
     end;
     if WizardIsTaskSelected('addtopath') then
       AddToUserPath;
+    if WizardIsTaskSelected('cmdautorun') then
+      AddCmdAutoRun;
   end;
 end;
 
@@ -185,6 +245,7 @@ begin
         mbInformation, MB_OK);
     RunTstampPS('remove');
     RemoveFromUserPath;
+    RemoveCmdAutoRun;
   end;
   if CurUninstallStep = usPostUninstall then
   begin
