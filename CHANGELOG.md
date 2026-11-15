@@ -28,6 +28,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- In PowerShell and in the Command Prompt session, a command typed twice in a row
+  now gets its START and END lines the second time too. PSReadLine used to skip
+  the repeated command before TStamp could see it. TStamp now turns off PSReadLine's
+  "no duplicates" setting for that window (it is not saved), so the Up arrow may
+  show a repeated command twice.
 - Opening a Command Prompt session is faster: PowerShell no longer asks Windows
   for the boot time (about 0.4 s) when the global flag was written after the
   current start-up.

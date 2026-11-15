@@ -50,6 +50,13 @@ Run `tstamp status` to see the live windows.
 
 The installer is not code-signed. Choose **More info**, then **Run anyway**.
 
+## The Up arrow in PowerShell shows the same command twice
+
+TStamp turns off PSReadLine's "no duplicates" setting in windows where it is
+loaded, for that window only. Without it, PowerShell hides a command that is the
+same as the one before it from TStamp, and the second run would get no START and
+END lines. Nothing is saved: a window without TStamp behaves as before.
+
 ## My antivirus blocked or removed the installer
 
 Because the installer is new and not code-signed, some antivirus programs treat
