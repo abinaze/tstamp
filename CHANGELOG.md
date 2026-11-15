@@ -28,6 +28,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Opening a Command Prompt session is faster: PowerShell no longer asks Windows
+  for the boot time (about 0.4 s) when the global flag was written after the
+  current start-up.
 - The Command Prompt session script now also works when it runs under
   PowerShell 7 (removing a variable with `set VAR=` left an empty one behind
   there).

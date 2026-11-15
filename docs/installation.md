@@ -74,8 +74,9 @@ This is the only part of tstamp that writes a Windows setting: your user's
 It is added after any value that is already there, the old value is also saved
 under `HKEY_CURRENT_USER\Software\TStamp`, and uninstalling removes only
 tstamp's part. To skip it for one window, run `set TSTAMP_NO_AUTORUN=1` before
-opening that window from a script, or use `cmd /d`. It costs about half a second
-when a window opens, because the session runs in PowerShell.
+opening that window from a script, or use `cmd /d`. It adds a short delay,
+usually under a second, when a window opens, because the session runs in
+PowerShell.
 
 ### Command Prompt with Clink (optional)
 
