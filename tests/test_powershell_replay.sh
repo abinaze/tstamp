@@ -14,7 +14,9 @@ has() { # description, regex
 has "the live-line check exists"                      'function global:__ts_live_line'
 has "it reads the PSReadLine command line"            'GetBufferState'
 has "it compares the command line with the submitted text" '\.Trim\(\) -eq \(\$line'
-has "the handler checks it before recording START"    'if \(__ts_live_line \$line\) \{ \$null = __ts_submit \$line \}'
+has "the handler checks it before recording START"    'if \(\$live\) \{ \$null = __ts_submit \$line \}'
+has "repeated commands still reach the handler"        'Set-PSReadLineOption -HistoryNoDuplicates:\$false'
+has "the handler asks the live-line check first"       '\$live = __ts_live_line \$line'
 
 echo
 echo "passed=$pass failed=$fail"

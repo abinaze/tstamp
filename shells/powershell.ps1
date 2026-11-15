@@ -19,6 +19,18 @@ $global:__TS = @{
   Prompt = $null; PrevHandler = $null
 }
 
+# Developer trace: while the file ~/.tstamp/debug exists, what the hook sees is
+# written to %TEMP%\tstamp-debug.log. It is checked once, when the hook loads.
+$global:__TS.Debug = (Test-Path -LiteralPath (Join-Path $global:__TS.Home 'debug'))
+function global:__ts_debug {
+  param([string]$m)
+  if (-not $global:__TS.Debug) { return }
+  try {
+    $f = Join-Path ([IO.Path]::GetTempPath()) 'tstamp-debug.log'
+    [IO.File]::AppendAllText($f, ('{0} [{1}] {2}' -f [DateTime]::Now.ToString('HH:mm:ss.fff'), $PID, $m) + "`n")
+  } catch { }
+}
+
 function global:__ts_us { [long](([DateTime]::UtcNow.Ticks - 621355968000000000) / 10) }
 
 function global:__ts_fmt {
@@ -196,8 +208,8 @@ function global:__ts_submit {
   param([string]$line)
   $t = $line.Trim()
   if (-not $t -or $t -match '^(tstamp|tstamp-a|exit|logout)(\s|$)') { return }
-  if (-not (__ts_enabled)) { return }
-  if (-not (__ts_session)) { return }
+  if (-not (__ts_enabled)) { __ts_debug ('submit skipped, not enabled: [{0}]' -f $t); return }
+  if (-not (__ts_session)) { __ts_debug ('submit skipped, no session: [{0}]' -f $t); return }
   $want = if ($global:__TS.LocalFmt) { $global:__TS.LocalFmt } else { __ts_config_format }
   $fmt = __ts_fmt_string $want
   if (-not $fmt) { $fmt = __ts_fmt_string '4' }
@@ -209,6 +221,7 @@ function global:__ts_submit {
   $global:__TS.Err0 = $(if ($global:Error.Count) { $global:Error[0] } else { $null })
   Write-Host ('[{0}][{1}] START: {2}' -f $global:__TS.Sid, (__ts_fmt $us $fmt), $t)
   __ts_log 'START' $us '' '' $t
+  __ts_debug ('START printed: [{0}]' -f $t)
 }
 
 function global:__ts_bash {
@@ -342,10 +355,22 @@ function global:__ts_live_line {
   (([string]$b) -replace "`r", '').Trim() -eq ($line -replace "`r", '').Trim()
 }
 
+# PSReadLine drops a command that is identical to the one before it BEFORE it calls
+# the history handler, so a command typed twice in a row would get no START and END
+# the second time. Turning off "no duplicates" for this window only (it is not saved)
+# lets every command reach the handler. The cost: the Up arrow can show a repeated
+# command twice.
 try {
+  Set-PSReadLineOption -HistoryNoDuplicates:$false
   Set-PSReadLineOption -AddToHistoryHandler {
     param([string]$line)
-    if (__ts_live_line $line) { $null = __ts_submit $line }
+    $live = __ts_live_line $line
+    if ($global:__TS.Debug) {
+      $bb = $null; $cc = $null
+      try { [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$bb, [ref]$cc) } catch { $bb = '<error>' }
+      __ts_debug ('handler line=[{0}] buffer=[{1}] live={2} local={3}' -f $line, $bb, $live, $global:__TS.Local)
+    }
+    try { if ($live) { $null = __ts_submit $line } } catch { __ts_debug ('submit failed: ' + $_.Exception.Message) }
     if ($global:__TS.PrevHandler) { & $global:__TS.PrevHandler $line } else { $true }
   }
 } catch {

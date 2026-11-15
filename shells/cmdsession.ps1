@@ -96,6 +96,7 @@ function global:PSConsoleHostReadLine {
   if ($global:__TS.OrigReadLine) { $line = & $global:__TS.OrigReadLine }
   else { $line = [Microsoft.PowerShell.PSConsoleReadLine]::ReadLine($host.Runspace, $ExecutionContext) }
   $t = ([string]$line).Trim()
+  __ts_debug ('readline returned [{0}]' -f $t)
   if (-not $t -or $t -match '^(tstamp|tstamp-a|exit|logout)(\s|$)') { return $line }
   $global:__TS.CmdExit = $null
   "__ts_cmdrun '" + $t.Replace("'", "''") + "'"
