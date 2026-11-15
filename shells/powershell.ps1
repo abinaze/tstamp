@@ -95,19 +95,36 @@ function global:__ts_same_boot {
   [math]::Abs($x - $y) -le 120
 }
 
+# Quick check that needs no Windows query: a flag that is younger than the time
+# the system has been running was written after this start-up. A wrong guess can
+# only be "not sure" (the tick count wraps after 24 days and may skip time spent
+# asleep), and then the real boot time is looked up as before.
+function global:__ts_young_flag {
+  param($since)
+  $s = 0L
+  if (-not [long]::TryParse([string]$since, [ref]$s) -or $s -le 0) { return $false }
+  $tick = [Environment]::TickCount
+  if ($tick -lt 0) { return $false }
+  $age = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - $s
+  ($age -ge 0) -and ($age -le [math]::Floor($tick / 1000))
+}
+
 # Returns the "gen" value of the global flag when global tracking is on for
 # this boot ("legacy" for a flag written without one), otherwise $null.
 function global:__ts_global_gen {
   $f = Join-Path $global:__TS.Home 'enabled'
   if (-not (Test-Path -LiteralPath $f)) { return $null }
-  $boot = ''; $gen = ''
+  $boot = ''; $gen = ''; $since = ''
   try {
     foreach ($l in [IO.File]::ReadAllLines($f)) {
       if ($l.StartsWith('boot=')) { $boot = $l.Substring(5) }
       elseif ($l.StartsWith('gen=')) { $gen = $l.Substring(4) }
+      elseif ($l.StartsWith('since=')) { $since = $l.Substring(6) }
     }
   } catch { return $null }
-  if (-not (__ts_same_boot $boot (__ts_boot))) { return $null }
+  if (-not (__ts_young_flag $since)) {
+    if (-not (__ts_same_boot $boot (__ts_boot))) { return $null }
+  }
   if ($gen) { return $gen }
   'legacy'
 }
