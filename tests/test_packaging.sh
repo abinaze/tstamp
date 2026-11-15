@@ -64,7 +64,7 @@ done
 check "installer picture wizard-100.bmp is 164 wide" 164 "$(od -An -tu4 -j18 -N4 "$ROOT/installer/assets/wizard-100.bmp" | tr -d ' ')"
 check "installer picture wizard-100.bmp is 314 high" 314 "$(od -An -tu4 -j22 -N4 "$ROOT/installer/assets/wizard-100.bmp" | tr -d ' ')"
 check "installer picture small-100.bmp is 55 wide" 55 "$(od -An -tu4 -j18 -N4 "$ROOT/installer/assets/small-100.bmp" | tr -d ' ')"
-check "installer icon is an icon file" "0 1 1" "$(od -An -tu2 -N6 "$ROOT/installer/assets/tstamp.ico" | awk '{ print $1, $2, ($3 > 0) }')"
+check "installer icon is an icon file" "0 1 1" "$(od -An -tu2 -N6 "$ROOT/installer/assets/tstamp.ico" | awk 'NR == 1 { print $1, $2, ($3 > 0) }')"  # first line only: od on macOS prints an extra blank line
 has   "iss: PowerShell hook uses the tested command" "$ISS" '--powershell --yes"'
 has   "iss: the environment change is broadcast" "$ISS" 'ChangesEnvironment=yes'
 has   "iss: uninstall removes the PATH entry" "$ISS" 'RemoveFromUserPath;'
