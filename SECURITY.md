@@ -33,6 +33,8 @@ within a week.
   `~/.tstamp/logs` and are readable by your own user account. Run
   `tstamp stop` in that terminal before typing secrets, and delete old logs.
 - The Windows installer is not code-signed. Compare your download with
-  `SHA256SUMS.txt` from the same release page.
+  `SHA256SUMS.txt` from the same release page. Some antivirus programs flag
+  unsigned installers they have not seen before; the release page and
+  `docs/troubleshooting.md` explain what to do.
 - The hook adds one block, marked `# >>> tstamp >>>` and
   `# <<< tstamp <<<`, to `~/.bashrc` (and your PowerShell profile, if you choose) after making a backup.

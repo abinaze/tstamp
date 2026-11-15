@@ -13,7 +13,8 @@ https://git-scm.com/download/win. The tstamp installer tells you if it is missin
    [Releases page](https://github.com/abinaze/tstamp/releases/latest).
 2. Open the file. You do not need administrator rights.
 3. Windows may say "unknown publisher", because the installer is not
-   code-signed. Choose **More info**, then **Run anyway**.
+   code-signed. Choose **More info**, then **Run anyway**. Some antivirus
+   programs may also block it; see [troubleshooting](troubleshooting.md).
 4. Keep the first three boxes ticked: **Git Bash**, **PowerShell**, and **CMD
    and PowerShell commands**. The installer saves a backup of your `~/.bashrc`
    and of your PowerShell profile first. The third box adds tstamp to your user

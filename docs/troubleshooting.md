@@ -50,6 +50,18 @@ Run `tstamp status` to see the live windows.
 
 The installer is not code-signed. Choose **More info**, then **Run anyway**.
 
+## My antivirus blocked or removed the installer
+
+Because the installer is new and not code-signed, some antivirus programs treat
+it as unknown. Avast, for example, can quarantine it while it runs with a generic
+warning called `IDP.Generic`. A blocked install can stop halfway and leave files
+missing. To make sure your download is the real one, compare its SHA-256 with
+`SHA256SUMS.txt` on the same release page (in Command Prompt:
+`certutil -hashfile tstamp-windows-setup.exe SHA256`). If they match, restore the
+installer from your antivirus's quarantine, report it there as a false positive,
+and run the installer again. If a half-finished install is left behind, run the
+installer once more over it. You can also report the problem in an issue.
+
 ## Windows says Git Bash was not found
 
 Install Git for Windows from https://git-scm.com/download/win, then run the
