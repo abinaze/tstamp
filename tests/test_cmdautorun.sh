@@ -66,6 +66,10 @@ case "$(uname -s)" in
       "$PS" -NoProfile -ExecutionPolicy Bypass -File "$(W "$S")" -Auto </dev/null >/dev/null 2>&1
       check "session -Auto: exit code 2 for a flag from before a reboot" 2 "$?"
       check "session -Auto: the leftover flag is removed" no "$([ -e "$TMP/state/enabled" ] && echo yes || echo no)"
+      # A flag written a moment ago is accepted without looking up the boot time.
+      printf 'boot=ts:1\nsince=%s\ngen=x\n' "$(date +%s)" > "$TMP/state/enabled"
+      out="$("$PS" -NoProfile -ExecutionPolicy Bypass -File "$(W "$S")" -Auto </dev/null 2>&1 | tr -d '\r')"
+      hasout "session -Auto: a flag from this start-up is accepted quickly" 'TStamp is tracking this window' "$out"
       printf 'boot=none\nsince=1\ngen=x\n' > "$TMP/state/enabled"
       out="$("$PS" -NoProfile -ExecutionPolicy Bypass -File "$(W "$S")" -Auto </dev/null 2>&1 | tr -d '\r')"
       hasout "session -Auto: starts when global tracking is on" 'TStamp is tracking this window' "$out"
