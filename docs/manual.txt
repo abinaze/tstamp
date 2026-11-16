@@ -239,7 +239,10 @@ SHELL COMPATIBILITY
        Restart behaviour                Tested with a real restart in
                                         Git Bash. Not yet in PowerShell.
        WSL, other Linux                 Not tested yet.
-       Windows Terminal, IDE terminals  Not tested yet.
+       Windows Terminal                 Tried by hand with Windows
+                                        PowerShell 5.1 and Command Prompt
+                                        tabs.
+       IDE terminals                    Not tested yet.
        zsh (the Mac default), fish      Not supported yet.
 
        Requirements: bash 4.4 or newer. On Windows, Git for Windows, which

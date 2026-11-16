@@ -117,7 +117,8 @@ Every command is explained in [Commands](docs/commands.md).
 | PowerShell 7 | Tested by hand with 7.7, and the PowerShell tests run on it in CI |
 | CMD | The window is not tracked on its own. Typing `tstamp-a` or `tstamp` starts a tracked session that runs each line in cmd.exe (experimental, installs nothing). The installer's optional Command Prompt box starts that session in every new window while tracking is on. `tstamp run COMMAND` times one command. The optional Clink add-on tracks the real window |
 | zsh, fish | Not supported yet |
-| WSL, Windows Terminal, IDE terminals | Not tested yet |
+| Windows Terminal | Tried by hand with Windows PowerShell 5.1 and Command Prompt tabs |
+| WSL, IDE terminals | Not tested yet |
 
 Details and requirements: [Compatibility](docs/compatibility.md).
 

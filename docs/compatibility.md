@@ -11,7 +11,8 @@ that.
 | macOS built-in bash 3.2 | Not supported. The installer script runs, but tstamp itself needs bash 4.4 or newer. |
 | Restart behaviour | Tested on Windows with a real restart in Git Bash. Not yet tested in PowerShell. |
 | WSL, other Linux | Not tested yet. |
-| Windows Terminal, VS Code or other terminals running bash | Not tested yet. |
+| Windows Terminal | Tried by hand on Windows 11 with Windows PowerShell 5.1 and Command Prompt tabs, including the Command Prompt session. Not tested with bash in a tab, and not tested in CI. |
+| VS Code or other terminals running bash | Not tested yet. |
 | Windows PowerShell 5.1 | Tested. START and END lines, exit codes, shared logs and the profile hook are tested in CI and were tried by hand on Windows 11. |
 | PowerShell 7 | Tested. START and END lines, exit codes and the stop rules were tried by hand with PowerShell 7.7 on Windows 11, and the PowerShell tests also run on PowerShell 7 in CI. |
 | Command Prompt (CMD) | **The window is not tracked on its own**, because CMD has no way to run code around each command. Typing `tstamp-a` (all windows) or `tstamp` (this window) there starts a tracked session in the same window that runs each line in `cmd.exe`; it is experimental, tried by hand on Windows 11 with Windows PowerShell 5.1, and tested in CI on Windows. The installer's optional, unticked **Command Prompt** box makes every new window open as that session while global tracking is on: it was tried by hand in real new windows, and its install and uninstall are checked in CI. `tstamp run COMMAND` times one command. With the optional [Clink](https://github.com/chrisant996/clink) add-on the real window is tracked; this was tried by hand with Clink 1.9, and its logic is tested in CI with a fake Clink. See [installation](installation.md). |
