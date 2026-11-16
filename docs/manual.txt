@@ -244,7 +244,10 @@ SHELL COMPATIBILITY
        Windows Terminal                 Tried by hand with Windows
                                         PowerShell 5.1 and Command Prompt
                                         tabs.
-       IDE terminals                    Not tested yet.
+       VS Code terminal                 Tried by hand with Git Bash,
+                                        PowerShell 7 and Command Prompt
+                                        tabs.
+       Other IDE terminals              Not tested yet.
        zsh (the Mac default), fish      Not supported yet.
 
        Requirements: bash 4.4 or newer. On Windows, Git for Windows, which

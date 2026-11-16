@@ -13,6 +13,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
   window and `Timed commands` for all windows' logs. Only finished commands
   (those with an END line) are counted.
 
+### Changed
+
+- The compatibility tables now say the VS Code terminal was tried by hand with
+  Git Bash, PowerShell 7 and Command Prompt tabs.
+
 ### Fixed
 
 - In the VS Code terminal with PowerShell 7, every command ended with a PSReadLine
