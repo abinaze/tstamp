@@ -54,15 +54,18 @@ their next prompt, including windows where you typed `tstamp` yourself. Type
 ## tstamp status
 
 Shows this window's state and label, the saved time style, whether global
-tracking is on, and which windows are open. Example:
+tracking is on, which windows are open, and how many commands were timed (in
+this window and in all windows). Example:
 
 ```text
 This terminal : on (global)
 Session ID    : T1
 Format here   : %H:%M:%S
+Timed here    : 12
 Global        : on (since 2026-10-30 07:37:50)
 Default format: 2
 Live sessions : T1(pid 1173) T2(pid 1199)
+Timed commands: 31 (all terminals, 4 log files)
 ```
 
 ## tstamp export

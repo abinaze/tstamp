@@ -7,6 +7,22 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `tstamp status` now shows how many commands were timed: `Timed here` for this
+  window and `Timed commands` for all windows' logs. Only finished commands
+  (those with an END line) are counted.
+
+### Fixed
+
+- In the VS Code terminal with PowerShell 7, every command ended with a PSReadLine
+  "Oops, something went wrong" error. VS Code sets its own history handler, and TStamp
+  tried to run it like a script block. TStamp now calls it the right way, and a failing
+  earlier handler can no longer break the command line.
+- `tstamp status` typed in a window without the TStamp hook (for example
+  Command Prompt, or a plain script) stopped after "Default format" when global
+  tracking was off. It now shows every line.
+
 ## [0.2.0] - 2026-11-14
 
 ### Added

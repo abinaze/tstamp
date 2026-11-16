@@ -70,7 +70,9 @@ COMMANDS
 
        tstamp status
               Show whether tracking is on in this window, this window's
-              label, the time style, and whether the global switch is on.
+              label, the time style, whether the global switch is on, and
+              how many commands were timed (in this window and in all
+              windows' logs).
 
    Records
        tstamp export [-o FILE] [SESSION...]
