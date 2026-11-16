@@ -20,7 +20,7 @@ fi
 pass=0
 fail=0
 echo "PowerShell 7 version: $(pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()' 2>/dev/null | tr -d '\r')"
-for t in test_powershell.sh test_powershell_scope.sh test_cmdsession.sh; do
+for t in test_powershell.sh test_powershell_scope.sh test_powershell_prevhandler.sh test_cmdsession.sh; do
   if out="$(TSTAMP_TEST_POWERSHELL=pwsh bash "$ROOT/tests/$t" 2>&1)"; then
     pass=$((pass + 1)); echo "ok   - $t passes on PowerShell 7"
   else

@@ -282,6 +282,22 @@ function global:tstamp-a {
   Write-Host 'Tracking turns off after a reboot.'
 }
 
+# Number of finished commands (END lines, 4th tab-separated field) in the given logs.
+function global:__ts_count_end {
+  param([string[]]$files)
+  $n = 0
+  foreach ($f in $files) {
+    if (-not $f -or -not (Test-Path -LiteralPath $f)) { continue }
+    try {
+      foreach ($l in [IO.File]::ReadLines($f)) {
+        $p = $l.Split("`t")
+        if ($p.Length -gt 3 -and $p[3] -eq 'END') { $n++ }
+      }
+    } catch { }
+  }
+  $n
+}
+
 function global:tstamp {
   $a = @($args)
   $c = if ($a.Count) { [string]$a[0] } else { '' }
@@ -314,6 +330,9 @@ function global:tstamp {
       Write-Host ('Format here   : {0}' -f (__ts_fmt_string $want))
       Write-Host ('State dir     : {0}' -f $global:__TS.Home)
       Write-Host ('Global        : {0}' -f $(if ($null -ne $g) { 'on' } else { 'off' }))
+      $logs = @(Get-ChildItem -LiteralPath (Join-Path $global:__TS.Home 'logs') -Filter 'T*.log' -File -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+      Write-Host ('Timed here    : {0}' -f (__ts_count_end @($global:__TS.Log)))
+      Write-Host ('Timed commands: {0} (all terminals, {1} log file{2})' -f (__ts_count_end $logs), $logs.Count, $(if ($logs.Count -eq 1) { '' } else { 's' }))
     }
     default { __ts_delegate $a }
   }
@@ -355,6 +374,21 @@ function global:__ts_live_line {
   (([string]$b) -replace "`r", '').Trim() -eq ($line -replace "`r", '').Trim()
 }
 
+# Calls the history handler that was set before TStamp's. It can be a script block
+# or a .NET delegate (VS Code's terminal sets a Func[string,object]); a delegate
+# cannot be run with &. If it fails, the command is simply kept in the history.
+function global:__ts_call_prev {
+  param([string]$line)
+  $prev = $global:__TS.PrevHandler
+  try {
+    if ($prev -is [scriptblock]) { return (& $prev $line) }
+    if ($prev -is [System.Delegate]) { return $prev.Invoke($line) }
+  } catch {
+    __ts_debug ('previous handler failed: ' + $_.Exception.Message)
+  }
+  $true
+}
+
 # PSReadLine drops a command that is identical to the one before it BEFORE it calls
 # the history handler, so a command typed twice in a row would get no START and END
 # the second time. Turning off "no duplicates" for this window only (it is not saved)
@@ -371,7 +405,7 @@ try {
       __ts_debug ('handler line=[{0}] buffer=[{1}] live={2} local={3}' -f $line, $bb, $live, $global:__TS.Local)
     }
     try { if ($live) { $null = __ts_submit $line } } catch { __ts_debug ('submit failed: ' + $_.Exception.Message) }
-    if ($global:__TS.PrevHandler) { & $global:__TS.PrevHandler $line } else { $true }
+    __ts_call_prev $line
   }
 } catch {
   Write-Warning 'tstamp: could not hook the command line (no interactive console), so only manual calls work.'
