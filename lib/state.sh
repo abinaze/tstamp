@@ -176,9 +176,33 @@ tstamp_cmd_global() {
   tstamp_cmd_global_on "$@"
 }
 
+# Usage: tstamp_count_timed [LOGFILE...]
+# Sets TSTAMP_TIMED to the number of finished commands (END lines) in the given
+# logs, or in every log of every terminal when no file is given.
+# Sets TSTAMP_TIMED_FILES to the number of log files that were read.
+tstamp_count_timed() {
+  local f files=()
+  TSTAMP_TIMED=0
+  TSTAMP_TIMED_FILES=0
+  if [ "$#" -gt 0 ]; then
+    for f in "$@"; do
+      [ -f "$f" ] && files+=("$f")
+    done
+  else
+    for f in "$TSTAMP_HOME"/logs/T*.log; do
+      [ -f "$f" ] && files+=("$f")
+    done
+  fi
+  TSTAMP_TIMED_FILES="${#files[@]}"
+  [ "$TSTAMP_TIMED_FILES" -gt 0 ] || return 0
+  TSTAMP_TIMED="$(awk -F'\t' '$4 == "END" { n++ } END { print n + 0 }' "${files[@]}" 2>/dev/null)"
+  [[ "$TSTAMP_TIMED" =~ ^[0-9]+$ ]] || TSTAMP_TIMED=0
+}
+
 tstamp_print_global_status() {
   local s pid list="" since_txt
   tstamp_global_state
+  [ -n "${TSTAMP_BOOT:-}" ] || tstamp_boot_token
   case "$TSTAMP_GLOBAL" in
     on)
       since_txt="$TSTAMP_GLOBAL_SINCE"
@@ -200,4 +224,6 @@ tstamp_print_global_status() {
     [ -n "$s" ] && list="$list $s(pid $pid)"
   done < <(tstamp_sessions_live)
   printf 'Live sessions :%s\n' "${list:- none}"
+  tstamp_count_timed
+  printf 'Timed commands: %s (all terminals, %s log file%s)\n' "$TSTAMP_TIMED" "$TSTAMP_TIMED_FILES" "$([ "$TSTAMP_TIMED_FILES" = 1 ] || echo s)"
 }

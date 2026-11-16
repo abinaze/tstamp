@@ -243,6 +243,12 @@ tstamp() {
       printf 'Session ID    : %s\n' "${__tstamp_sid:-not assigned yet}"
       printf 'Format here   : %s\n' "$__tstamp_fmt"
       printf 'State dir     : %s\n' "$TSTAMP_HOME"
+      tstamp_count_timed ${__tstamp_log:+"$__tstamp_log"}
+      if [ -n "$__tstamp_log" ]; then
+        printf 'Timed here    : %s\n' "$TSTAMP_TIMED"
+      else
+        printf 'Timed here    : 0\n'
+      fi
       tstamp_print_global_status
       ;;
     *)
