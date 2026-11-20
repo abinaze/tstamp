@@ -7,6 +7,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The compatibility page says the Windows installer wizard of 0.2.1 was looked at
+  by hand on Windows 11.
+
 ## [0.2.1] - 2026-11-16
 
 ### Added
