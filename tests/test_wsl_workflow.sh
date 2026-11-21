@@ -22,6 +22,10 @@ has   "the setup action is pinned to a 40-character commit" 'uses: Vampire/setup
 lacks "it uses no secrets"                                  'secrets\.'
 has   "it has a timeout"                                    'timeout-minutes: [0-9]+'
 
+# Workflow files must have LF line endings on every system, because tests that
+# read them with grep (for example "^  contents: read$") fail on a CR.
+if grep -Eq '^\*\.yml text eol=lf$' "$ROOT/.gitattributes"; then pass=$((pass + 1)); echo "ok   - .gitattributes keeps LF in workflow files"; else fail=$((fail + 1)); echo "FAIL - .gitattributes keeps LF in workflow files"; fi
+
 echo
 echo "passed=$pass failed=$fail"
 [ "$fail" -eq 0 ]
