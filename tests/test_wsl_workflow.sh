@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
 # Static checks for the optional WSL workflow: manual start only, read-only
 # permissions, and the third-party action pinned to one exact commit.
+# Uses only grep, so it behaves the same on Linux, macOS and Windows.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WF="$ROOT/.github/workflows/wsl.yml"
 pass=0
 fail=0
-check() { # description, yes|no
-  if [ "$2" = yes ]; then pass=$((pass + 1)); echo "ok   - $1"; else fail=$((fail + 1)); echo "FAIL - $1"; fi
+has() { # description, regex: the workflow must contain it
+  if grep -Eq -- "$2" "$WF"; then pass=$((pass + 1)); echo "ok   - $1"; else fail=$((fail + 1)); echo "FAIL - $1"; fi
 }
-has() { grep -Eq -- "$1" "$WF" && echo yes || echo no; }
+lacks() { # description, regex: the workflow must not contain it
+  if grep -Eq -- "$2" "$WF"; then fail=$((fail + 1)); echo "FAIL - $1"; else pass=$((pass + 1)); echo "ok   - $1"; fi
+}
 
-check "the workflow exists"                              "$([ -f "$WF" ] && echo yes || echo no)"
-check "it starts by hand only"                           "$(has '^  workflow_dispatch:$')"
-check "it has no push, pull request or release trigger"  "$(has '^  (push|pull_request|release|schedule|workflow_call):' | sed 's/yes/no/;t;s/no/yes/')"
-check "it has read-only permissions"                     "$(has '^  contents: read$')"
-check "the setup action is pinned to a 40-character commit" "$(has 'uses: Vampire/setup-wsl@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+$')"
-check "it uses no secrets"                               "$(has 'secrets\.' | sed 's/yes/no/;t;s/no/yes/')"
-check "it has a timeout"                                 "$(has 'timeout-minutes: [0-9]+')"
+if [ -f "$WF" ]; then pass=$((pass + 1)); echo "ok   - the workflow exists"; else fail=$((fail + 1)); echo "FAIL - the workflow exists"; fi
+has   "it starts by hand only"                              '^  workflow_dispatch:'
+lacks "it has no push, pull request or release trigger"     '^  (push|pull_request|release|schedule|workflow_call):'
+has   "it has read-only permissions"                        '^  contents: read'
+has   "the setup action is pinned to a 40-character commit" 'uses: Vampire/setup-wsl@[0-9a-f]{40} # v[0-9]+\.[0-9]+\.[0-9]+'
+lacks "it uses no secrets"                                  'secrets\.'
+has   "it has a timeout"                                    'timeout-minutes: [0-9]+'
 
 echo
 echo "passed=$pass failed=$fail"
