@@ -33,15 +33,27 @@ jobs:
           bash --version | sed -n 1p
           pwd
 
-      - name: Install Lua for the Clink script test
+      - name: Install curl and Lua
         shell: wsl-bash {0}
         run: |
           apt-get update || true
+          apt-get install -y curl
           apt-get install -y lua5.3 || echo "Lua not installed, the Clink test may skip"
+
+      - name: Copy the repository into the WSL file system
+        shell: wsl-bash {0}
+        run: |
+          # The Windows drive does not keep Unix permissions in WSL, which a
+          # real WSL user's home folder does. Test from the home folder.
+          rm -rf "$HOME/tstamp"
+          cp -R "$PWD" "$HOME/tstamp"
+          cd "$HOME/tstamp"
+          pwd
 
       - name: Run the tests
         shell: wsl-bash {0}
         run: |
+          cd "$HOME/tstamp"
           status=0
           for t in tests/test_*.sh; do
             echo "== $t"
@@ -59,6 +71,7 @@ jobs:
       - name: Install and remove the Unix package
         shell: wsl-bash {0}
         run: |
+          cd "$HOME/tstamp"
           bash installer/build-unix.sh
           d="$(mktemp -d)"
           tar -xzf dist/tstamp-unix.tar.gz -C "$d"
