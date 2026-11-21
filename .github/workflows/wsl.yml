@@ -2,7 +2,9 @@ name: WSL
 
 # Optional check: runs the test suite and a Unix package install inside WSL on a
 # Windows runner. It starts by hand only (Actions tab, WSL, Run workflow) and is
-# not part of the release. GitHub's Windows runners provide WSL 1, not WSL 2.
+# not part of the release. The run on 21 Nov 2026 printed a WSL 2 kernel and
+# Debian 13, so the compatibility pages name exactly that. Check the printed
+# kernel and distribution again before changing those words.
 # The setup action is from a third party, so it is pinned to one exact commit
 # (v7.2.0). Check the new version and commit before changing the pin.
 
