@@ -7,6 +7,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- An optional workflow that runs the tests and a Unix package install inside WSL on a
+  Windows runner. It starts by hand only and is not part of the release.
+
 ### Changed
 
 - The compatibility page says the Windows installer wizard of 0.2.1 was looked at
