@@ -119,7 +119,8 @@ Every command is explained in [Commands](docs/commands.md).
 | zsh, fish | Not supported yet |
 | Windows Terminal | Tried by hand with Windows PowerShell 5.1 and Command Prompt tabs |
 | VS Code terminal | Tried by hand with Git Bash, PowerShell 7 and Command Prompt tabs |
-| WSL, other IDE terminals | Not tested yet |
+| WSL | Tested on WSL 2 with Debian 13 by an optional workflow, not tried by hand |
+| Other IDE terminals | Not tested yet |
 
 Details and requirements: [Compatibility](docs/compatibility.md).
 

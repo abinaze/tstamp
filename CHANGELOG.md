@@ -14,6 +14,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The compatibility tables say the tests and a Unix package install pass on WSL 2 with
+  Debian 13, run by the optional WSL workflow. This was not tried by hand.
+
 - The compatibility page says the Windows installer wizard of 0.2.1 was looked at
   by hand on Windows 11.
 

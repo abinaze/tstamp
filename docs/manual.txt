@@ -240,7 +240,10 @@ SHELL COMPATIBILITY
                                         3.2 is too old.
        Restart behaviour                Tested with a real restart in
                                         Git Bash. Not yet in PowerShell.
-       WSL, other Linux                 Not tested yet.
+       WSL                              Tested on WSL 2 with Debian 13
+                                        by an optional workflow on a
+                                        GitHub runner. Not tried by hand.
+       Other Linux                      Not tested yet.
        Windows Terminal                 Tried by hand with Windows
                                         PowerShell 5.1 and Command Prompt
                                         tabs.

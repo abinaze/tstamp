@@ -11,7 +11,8 @@ that.
 | macOS built-in bash 3.2 | Not supported. The installer script runs, but tstamp itself needs bash 4.4 or newer. |
 | Windows installer wizard | The wizard pages of version 0.2.1 were looked at by hand on Windows 11. The silent install and removal are tested in CI. |
 | Restart behaviour | Tested on Windows with a real restart in Git Bash. Not yet tested in PowerShell. |
-| WSL, other Linux | Not tested yet. |
+| WSL | The test suite and a Unix package install and removal pass on WSL 2 with Debian 13, run by the optional WSL workflow on a GitHub Windows runner (started by hand, not on every push). Not tried by hand on a real PC. Other distributions are not tested. |
+| Other Linux | Not tested yet. |
 | Windows Terminal | Tried by hand on Windows 11 with Windows PowerShell 5.1 and Command Prompt tabs, including the Command Prompt session. Not tested with bash in a tab, and not tested in CI. |
 | VS Code terminal | Tried by hand on Windows 11 with Git Bash, PowerShell 7 and Command Prompt tabs. Not tested in CI. |
 | Other IDE terminals | Not tested yet. |
