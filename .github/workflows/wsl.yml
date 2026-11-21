@@ -1,0 +1,68 @@
+name: WSL
+
+# Optional check: runs the test suite and a Unix package install inside WSL on a
+# Windows runner. It starts by hand only (Actions tab, WSL, Run workflow) and is
+# not part of the release. GitHub's Windows runners provide WSL 1, not WSL 2.
+# The setup action is from a third party, so it is pinned to one exact commit
+# (v7.2.0). Check the new version and commit before changing the pin.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wsl:
+    name: Tests in WSL
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up WSL
+        uses: Vampire/setup-wsl@4c48163d9f981914dd8caa0fc335fe19cca5bff4 # v7.2.0
+
+      - name: Show the environment
+        shell: wsl-bash {0}
+        run: |
+          uname -srm
+          grep -i -m1 microsoft /proc/version || true
+          sed -n 1,2p /etc/os-release
+          bash --version | sed -n 1p
+          pwd
+
+      - name: Install Lua for the Clink script test
+        shell: wsl-bash {0}
+        run: |
+          apt-get update || true
+          apt-get install -y lua5.3 || echo "Lua not installed, the Clink test may skip"
+
+      - name: Run the tests
+        shell: wsl-bash {0}
+        run: |
+          status=0
+          for t in tests/test_*.sh; do
+            echo "== $t"
+            rc=0
+            out="$(bash "$t" 2>&1)" || rc=$?
+            printf '%s\n' "$out" | grep -E '^(FAIL|passed)' || true
+            if [ "$rc" -ne 0 ]; then
+              status=1
+              echo "-- last lines of $t (exit $rc):"
+              printf '%s\n' "$out" | tail -n 12
+            fi
+          done
+          exit "$status"
+
+      - name: Install and remove the Unix package
+        shell: wsl-bash {0}
+        run: |
+          bash installer/build-unix.sh
+          d="$(mktemp -d)"
+          tar -xzf dist/tstamp-unix.tar.gz -C "$d"
+          HOME="$d/home" bash "$d"/tstamp-*/install.sh --prefix "$d/share/tstamp" --bin "$d/bin" --no-hook
+          "$d/bin/tstamp" version
+          HOME="$d/home" bash "$d/share/tstamp/uninstall.sh" </dev/null
+          test ! -e "$d/share/tstamp/bin"
